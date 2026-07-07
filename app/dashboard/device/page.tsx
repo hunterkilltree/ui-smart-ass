@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Wifi, RefreshCw, Cpu } from "lucide-react";
-import { api } from "@/lib/api";
+import { DeviceAPI } from "@/lib/be";
 import { useI18n, type TKey } from "@/lib/i18n";
 import type { DeviceInfo } from "@/lib/types";
 import { Button, Card, Badge, Modal, Input, Alert, Spinner } from "@/components/ui";
@@ -33,7 +33,7 @@ export default function DevicePage() {
   const [updated, setUpdated] = useState(false);
 
   const load = useCallback(() => {
-    api<DeviceInfo>("/device").then(setDevice).catch(() => {});
+    DeviceAPI.info().then(setDevice).catch(() => {});
   }, []);
 
   useEffect(load, [load]);
@@ -43,10 +43,7 @@ export default function DevicePage() {
     setBusy(true);
     setError("");
     try {
-      await api("/device/wifi", {
-        method: "POST",
-        body: JSON.stringify({ ssid, password }),
-      });
+      await DeviceAPI.setWifi(ssid, password);
       setWifiOpen(false);
       setUpdated(true);
       setSsid("");

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { api } from "@/lib/api";
+import { AuthAPI } from "@/lib/be";
 import { useI18n } from "@/lib/i18n";
 import { AuthShell } from "@/components/AuthShell";
 import { Button, Input, Alert } from "@/components/ui";
@@ -19,10 +19,7 @@ export default function ForgotPasswordPage() {
     setError("");
     setBusy(true);
     try {
-      await api("/auth/forgot-password", {
-        method: "POST",
-        body: JSON.stringify({ email }),
-      });
+      await AuthAPI.forgotPassword(email);
       setSent(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error");

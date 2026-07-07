@@ -28,16 +28,21 @@ The built-in mock API accepts any email + any password ≥ 6 chars.
 - **i18n**: Vietnamese (default) + English, switchable, persisted in localStorage
 - Responsive (mobile + desktop), Vercel-deployable
 
-## Swapping mock → real backend
+## BE communication
 
-All client calls go through `lib/api.ts` and prefix `NEXT_PUBLIC_API_BASE_URL`:
+Two layers, both in `lib/`:
+
+- `lib/api.ts` — transport: base URL, Bearer token injection, JSON error normalization (`ApiError`)
+- `lib/be.ts` — **the only place endpoints are defined**: typed services `AuthAPI`, `ContactsAPI`, `VoiceAPI`, `LogsAPI`, `DeviceAPI`. All pages call these; nothing else touches `fetch`.
+
+Swapping mock → real backend:
 
 ```bash
 # .env.local
 NEXT_PUBLIC_API_BASE_URL=https://api.your-backend.com
 ```
 
-Empty value (default) = same-origin `/api/*` mock route handlers in `app/api/`.
+Empty value (default) = same-origin `/api/*` mock route handlers in `app/api/`. If the real BE contract differs from the mock, adjust paths/types in `lib/be.ts` (and `lib/types.ts`) only.
 
 ## Structure
 

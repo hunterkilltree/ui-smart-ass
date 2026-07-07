@@ -7,7 +7,8 @@ import React, {
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
-import { api, getToken, setToken } from "./api";
+import { getToken, setToken } from "./api";
+import { AuthAPI } from "./be";
 import type { User } from "./types";
 
 interface AuthCtx {
@@ -31,27 +32,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
       return;
     }
-    api<User>("/auth/me")
+    AuthAPI.me()
       .then(setUser)
       .catch(() => setToken(null))
       .finally(() => setLoading(false));
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const res = await api<{ user: User; token: string }>("/auth/sign-in", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
+    const res = await AuthAPI.signIn(email, password);
     setToken(res.token);
     setUser(res.user);
     router.push("/dashboard");
   };
 
   const signUp = async (email: string, password: string) => {
-    const res = await api<{ user: User; token: string }>("/auth/sign-up", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
+    const res = await AuthAPI.signUp(email, password);
     setToken(res.token);
     setUser(res.user);
     router.push("/dashboard");

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { api } from "@/lib/api";
+import { LogsAPI } from "@/lib/be";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import type { LogEntry } from "@/lib/types";
@@ -26,11 +26,10 @@ export default function LogsPage() {
 
   useEffect(() => {
     if (!user || user.role !== "developer") return;
-    const params = new URLSearchParams({ limit: "50" });
-    if (direction) params.set("direction", direction);
-    if (status) params.set("status", status);
     setLogs(null);
-    api<LogEntry[]>(`/logs?${params}`).then(setLogs).catch(() => setLogs([]));
+    LogsAPI.list({ direction: direction || undefined, status })
+      .then(setLogs)
+      .catch(() => setLogs([]));
   }, [user, direction, status]);
 
   if (!user || user.role !== "developer") return <Spinner />;

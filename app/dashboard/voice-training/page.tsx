@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Mic, Square, RotateCcw, Send, Shuffle } from "lucide-react";
-import { api } from "@/lib/api";
+import { VoiceAPI } from "@/lib/be";
 import { useI18n } from "@/lib/i18n";
 import type { VoicePrompt, VoiceSample } from "@/lib/types";
 import { Button, Card, Badge, Alert, Spinner } from "@/components/ui";
@@ -25,13 +25,13 @@ export default function VoiceTrainingPage() {
   const blobRef = useRef<Blob | null>(null);
 
   const loadSamples = useCallback(() => {
-    api<VoiceSample[]>("/voice-training/samples")
+    VoiceAPI.samples()
       .then(setSamples)
       .catch(() => setSamples([]));
   }, []);
 
   useEffect(() => {
-    api<VoicePrompt[]>("/voice-training/prompts")
+    VoiceAPI.prompts()
       .then(setPrompts)
       .catch(() => setPrompts([]));
     loadSamples();
@@ -104,10 +104,7 @@ export default function VoiceTrainingPage() {
     if (!prompt || !blobRef.current) return;
     setBusy(true);
     try {
-      const form = new FormData();
-      form.append("promptId", prompt.id);
-      form.append("audio", blobRef.current, "sample.webm");
-      await api("/voice-training/samples", { method: "POST", body: form });
+      await VoiceAPI.submitSample(prompt.id, blobRef.current);
       setSuccess(true);
       reset();
       loadSamples();

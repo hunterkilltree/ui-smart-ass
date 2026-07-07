@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Plug, Unplug } from "lucide-react";
-import { api } from "@/lib/api";
+import { ContactsAPI } from "@/lib/be";
 import { useI18n } from "@/lib/i18n";
 import type { Channel } from "@/lib/types";
 import { Button, Card, Badge, Modal, Input, Alert, Spinner } from "@/components/ui";
@@ -16,7 +16,7 @@ export default function ContactsPage() {
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(() => {
-    api<Channel[]>("/contacts").then(setChannels).catch(() => setChannels([]));
+    ContactsAPI.list().then(setChannels).catch(() => setChannels([]));
   }, []);
 
   useEffect(load, [load]);
@@ -33,10 +33,7 @@ export default function ContactsPage() {
     setBusy(true);
     setError("");
     try {
-      await api(`/contacts/${editing.id}/connect`, {
-        method: "POST",
-        body: JSON.stringify({ credentials: creds }),
-      });
+      await ContactsAPI.connect(editing.id, creds);
       setEditing(null);
       load();
     } catch (err) {
@@ -47,7 +44,7 @@ export default function ContactsPage() {
   };
 
   const disconnect = async (ch: Channel) => {
-    await api(`/contacts/${ch.id}/disconnect`, { method: "POST" });
+    await ContactsAPI.disconnect(ch.id);
     load();
   };
 
