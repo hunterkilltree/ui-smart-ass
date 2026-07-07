@@ -3,14 +3,8 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  Bot,
-  MessageSquare,
-  Mic,
-  ScrollText,
-  Cpu,
-  LogOut,
-} from "lucide-react";
+import { MessageSquare, Mic, ScrollText, Cpu, LogOut } from "lucide-react";
+import { LogoMark } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { useI18n, type TKey } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -43,15 +37,18 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-lotus-light bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white">
-              <Bot size={20} />
+            <LogoMark size={40} />
+            <div className="hidden sm:block">
+              <span className="block text-lg font-extrabold leading-tight tracking-wide text-sen">
+                {t("appName")}
+              </span>
+              <span className="block text-xs font-medium text-lotus-dark">
+                {t("tagline")}
+              </span>
             </div>
-            <span className="hidden font-semibold text-slate-900 sm:block">
-              {t("appName")}
-            </span>
           </div>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
@@ -64,7 +61,7 @@ export default function DashboardLayout({
             <button
               onClick={signOut}
               title={t("signOut")}
-              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+              className="rounded-xl p-2 text-slate-500 hover:bg-lotus-light hover:text-lotus-dark"
             >
               <LogOut size={18} />
             </button>
@@ -80,8 +77,8 @@ export default function DashboardLayout({
                 className={
                   "flex items-center gap-2 whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition-colors " +
                   (active
-                    ? "border-indigo-600 text-indigo-600"
-                    : "border-transparent text-slate-500 hover:text-slate-800")
+                    ? "border-lotus text-sen"
+                    : "border-transparent text-slate-500 hover:text-sen")
                 }
               >
                 <Icon size={16} />

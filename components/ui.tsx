@@ -14,17 +14,16 @@ export function Button({
   variant?: "primary" | "secondary" | "danger" | "ghost";
 }) {
   const styles = {
-    primary:
-      "bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300",
+    primary: "bg-sen text-white hover:bg-sen-dark disabled:opacity-50",
     secondary:
-      "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 disabled:text-slate-400",
+      "bg-white text-sen border border-sen/30 hover:bg-sen-light disabled:text-slate-400",
     danger: "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300",
-    ghost: "text-slate-600 hover:bg-slate-100 disabled:text-slate-400",
+    ghost: "text-slate-600 hover:bg-lotus-light disabled:text-slate-400",
   };
   return (
     <button
       className={cx(
-        "inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed",
+        "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed",
         styles[variant],
         className
       )}
@@ -57,7 +56,7 @@ export function Input({
       <input
         id={inputId}
         className={cx(
-          "w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100",
+          "w-full rounded-xl border px-3 py-2 text-sm outline-none transition-colors focus:border-sen focus:ring-2 focus:ring-sen-light",
           error ? "border-red-400" : "border-slate-300",
           className
         )}
@@ -78,7 +77,7 @@ export function Card({
   return (
     <div
       className={cx(
-        "rounded-xl border border-slate-200 bg-white p-5 shadow-sm",
+        "rounded-2xl border border-lotus-light bg-white p-5 shadow-sm",
         className
       )}
     >
@@ -164,7 +163,7 @@ export function Modal({
 export function Spinner() {
   return (
     <div className="flex justify-center py-10">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600" />
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-lotus-light border-t-sen" />
     </div>
   );
 }

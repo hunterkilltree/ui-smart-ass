@@ -1,11 +1,25 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+/* SEN brand palette — from the lotus logo */
+@theme {
+  --color-sen: #2f6bb3; /* SEN blue */
+  --color-sen-dark: #24568f;
+  --color-sen-light: #e3edf8;
+  --color-lotus: #f27da5; /* lotus pink */
+  --color-lotus-dark: #d95f8b;
+  --color-lotus-light: #fdeaf1;
+  --color-leaf: #5ea53c; /* leaf green */
+  --color-leaf-light: #e8f4df;
+  --color-cream: #faf3ec; /* warm cream background */
+  --color-gold: #c9a24b; /* circuit gold accent */
+}
+
+/* Slightly larger base size — senior-friendly readability */
+html {
+  font-size: 17px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-cream);
+  color: #1e293b;
 }

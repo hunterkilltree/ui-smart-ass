@@ -69,7 +69,7 @@ export default function SignUpPage() {
         </Button>
         <p className="text-center text-sm text-slate-500">
           {t("haveAccount")}{" "}
-          <Link href="/sign-in" className="text-indigo-600 hover:underline">
+          <Link href="/sign-in" className="text-sen hover:underline">
             {t("signIn")}
           </Link>
         </p>

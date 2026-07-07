@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
           <Alert kind="success">{t("resetLinkSent")}</Alert>
           <Link
             href="/sign-in"
-            className="block text-center text-sm text-indigo-600 hover:underline"
+            className="block text-center text-sm text-sen hover:underline"
           >
             {t("backToSignIn")}
           </Link>
@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
           </Button>
           <Link
             href="/sign-in"
-            className="block text-center text-sm text-indigo-600 hover:underline"
+            className="block text-center text-sm text-sen hover:underline"
           >
             {t("backToSignIn")}
           </Link>

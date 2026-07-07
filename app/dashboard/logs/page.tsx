@@ -36,7 +36,7 @@ export default function LogsPage() {
   if (!user || user.role !== "developer") return <Spinner />;
 
   const selectCls =
-    "rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-indigo-500";
+    "rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-sen";
 
   return (
     <div>

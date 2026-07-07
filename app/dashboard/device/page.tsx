@@ -86,7 +86,7 @@ export default function DevicePage() {
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <div className="mb-3 flex items-center gap-2 font-medium text-slate-900">
-            <Cpu size={18} className="text-indigo-600" /> {t("model")}
+            <Cpu size={18} className="text-sen" /> {t("model")}
           </div>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
@@ -105,7 +105,7 @@ export default function DevicePage() {
         <Card>
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2 font-medium text-slate-900">
-              <Wifi size={18} className="text-indigo-600" /> {t("wifiNetwork")}
+              <Wifi size={18} className="text-sen" /> {t("wifiNetwork")}
             </div>
             <Button variant="secondary" onClick={() => setWifiOpen(true)}>
               {t("changeWifi")}
@@ -125,7 +125,7 @@ export default function DevicePage() {
                       key={b}
                       className={
                         "w-1 rounded-sm " +
-                        (b <= bars ? "bg-indigo-600" : "bg-slate-200")
+                        (b <= bars ? "bg-leaf" : "bg-slate-200")
                       }
                       style={{ height: 4 + b * 3 }}
                     />

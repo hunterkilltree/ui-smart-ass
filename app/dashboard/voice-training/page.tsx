@@ -145,7 +145,7 @@ export default function VoiceTrainingPage() {
         )}
 
         <p className="text-sm text-slate-500">{t("readAloud")}</p>
-        <p className="my-3 rounded-lg bg-indigo-50 px-4 py-3 text-lg font-medium text-indigo-900">
+        <p className="my-3 rounded-2xl bg-lotus-light px-4 py-3 text-lg font-semibold text-sen-dark">
           “{prompt ? (lang === "vi" ? prompt.text_vi : prompt.text_en) : ""}”
         </p>
 

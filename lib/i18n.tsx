@@ -6,7 +6,8 @@ export type Lang = "vi" | "en";
 
 const dict = {
   vi: {
-    appName: "Smart AI Assistant Hub",
+    appName: "SEN",
+    tagline: "Người bạn đồng hành AI cho người lớn tuổi",
     // auth
     signIn: "Đăng nhập",
     signUp: "Đăng ký",
@@ -100,7 +101,8 @@ const dict = {
     led: "Đèn LED",
   },
   en: {
-    appName: "Smart AI Assistant Hub",
+    appName: "SEN",
+    tagline: "Your AI companion for seniors",
     signIn: "Sign In",
     signUp: "Sign Up",
     signOut: "Sign Out",

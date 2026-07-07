@@ -3,9 +3,9 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Smart AI Assistant Hub",
+  title: "SEN — Người bạn đồng hành AI",
   description:
-    "Control hub for your ESP32-based smart AI assistant device",
+    "SEN: người bạn đồng hành AI cho người lớn tuổi — quản lý thiết bị trợ lý thông minh ESP32",
 };
 
 export default function RootLayout({

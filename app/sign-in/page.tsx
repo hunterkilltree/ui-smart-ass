@@ -50,7 +50,7 @@ export default function SignInPage() {
         <div className="flex justify-end">
           <Link
             href="/forgot-password"
-            className="text-sm text-indigo-600 hover:underline"
+            className="text-sm text-sen hover:underline"
           >
             {t("forgotPassword")}
           </Link>
@@ -60,7 +60,7 @@ export default function SignInPage() {
         </Button>
         <p className="text-center text-sm text-slate-500">
           {t("noAccount")}{" "}
-          <Link href="/sign-up" className="text-indigo-600 hover:underline">
+          <Link href="/sign-up" className="text-sen hover:underline">
             {t("signUp")}
           </Link>
         </p>
