@@ -68,9 +68,24 @@ export default function DashboardLayout({
       <div className="mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center gap-6 px-4 py-16">
         <div className="flex flex-col items-center gap-2 text-center">
           <LogoMark size={64} label={t("logoAlt")} />
-          <span className="text-xl font-extrabold tracking-wide text-sen">
+          <span className="font-display text-2xl font-extrabold tracking-tight text-sen">
             {t("appName")}
           </span>
+          {/* squiggle flourish under the wordmark (decorative) */}
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            viewBox="0 0 160 14"
+            fill="none"
+            className="w-24 text-lotus"
+          >
+            <path
+              d="M3 10 Q 13 3 23 10 T 43 10 T 63 10 T 83 10 T 103 10 T 123 10 T 143 10 T 157 10"
+              stroke="currentColor"
+              strokeWidth="5"
+              strokeLinecap="round"
+            />
+          </svg>
         </div>
         <ErrorState
           className="w-full"
@@ -98,26 +113,35 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-lotus-light bg-white">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-2 gap-y-2 px-4 py-3">
+      <header className="border-b-2 border-ink bg-white">
+        <div className="relative mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-2 gap-y-2 px-4 py-3">
+          {/* confetti accents — wide screens only, where the middle is empty */}
+          <span
+            aria-hidden="true"
+            className="absolute left-1/2 top-4 hidden h-4 w-4 -translate-x-10 rotate-12 rounded-[4px] border-2 border-ink bg-gold xl:block"
+          />
+          <span
+            aria-hidden="true"
+            className="absolute left-1/2 top-9 hidden h-3 w-3 translate-x-3 rounded-full border-2 border-ink bg-leaf xl:block"
+          />
           <div className="flex items-center gap-2.5">
             <LogoMark size={40} label={t("logoAlt")} />
             <div className="hidden sm:block">
-              <span className="block text-lg font-extrabold leading-tight tracking-wide text-sen">
+              <span className="block font-display text-xl font-extrabold leading-tight tracking-tight text-sen">
                 {t("appName")}
               </span>
-              <span className="block text-xs font-medium text-lotus-dark">
+              <span className="block text-xs font-semibold text-lotus-dark">
                 {t("tagline")}
               </span>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <LanguageSwitcher />
-            {/* Mobile: compact identity — avatar initial + role badge */}
+            {/* Mobile: compact identity — avatar coin + role badge */}
             <div className="flex items-center gap-1.5 sm:hidden">
               <span
                 aria-hidden="true"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sen-light text-base font-bold text-sen-dark"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-gold font-display text-base font-extrabold text-ink shadow-pop-sm"
               >
                 {user.email.charAt(0).toUpperCase()}
               </span>
@@ -133,9 +157,9 @@ export default function DashboardLayout({
               onClick={signOut}
               aria-label={t("signOut")}
               title={t("signOut")}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-500 hover:bg-lotus-light hover:text-lotus-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-transparent text-slate-600 transition-colors hover:border-ink hover:bg-gold hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
             >
-              <LogOut size={20} aria-hidden="true" />
+              <LogOut size={20} strokeWidth={2.5} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -144,7 +168,7 @@ export default function DashboardLayout({
           aria-label={t("navSections")}
           onScroll={updateFade}
           style={maskImage ? { maskImage, WebkitMaskImage: maskImage } : undefined}
-          className="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-4"
+          className="mx-auto flex max-w-5xl gap-2 overflow-x-auto px-4 pb-3.5 pt-1"
         >
           {tabs.map(({ href, key, icon: Icon }) => {
             const active = pathname.startsWith(href);
@@ -155,13 +179,13 @@ export default function DashboardLayout({
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={
-                  "flex min-h-12 items-center gap-2 whitespace-nowrap rounded-t-lg border-b-2 px-3.5 py-3 text-base transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sen " +
+                  "flex min-h-12 items-center gap-2 whitespace-nowrap rounded-full border-2 px-5 text-base transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 " +
                   (active
-                    ? "border-sen bg-sen-light/60 font-semibold text-sen-dark"
-                    : "border-transparent font-medium text-slate-600 hover:border-lotus-light hover:text-sen-dark")
+                    ? "border-ink bg-sen font-bold text-white shadow-pop-sm focus-visible:outline-white"
+                    : "border-transparent font-semibold text-slate-600 hover:border-ink hover:bg-gold-light hover:text-ink focus-visible:outline-sen")
                 }
               >
-                <Icon size={18} aria-hidden="true" />
+                <Icon size={18} strokeWidth={2.5} aria-hidden="true" />
                 {t(key)}
               </Link>
             );

@@ -60,7 +60,7 @@ function wifiErrorMessage(err: unknown, t: (key: TKey) => string): string {
 function DeviceSkeleton() {
   return (
     <div aria-hidden="true">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         {[0, 1].map((i) => (
           <Card key={i}>
             <Skeleton className="mb-4 h-6 w-40" />
@@ -69,7 +69,7 @@ function DeviceSkeleton() {
           </Card>
         ))}
       </div>
-      <Skeleton className="mb-3 mt-6 h-6 w-48" />
+      <Skeleton className="mb-4 mt-8 h-6 w-48" />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {[0, 1, 2, 3, 4].map((i) => (
           <Card key={i} className="py-3">
@@ -178,14 +178,35 @@ export default function DevicePage() {
 
   return (
     <div>
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">
+          <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink">
             {t("deviceTitle")}
           </h2>
-          <p className="mt-1 text-base text-slate-600">{t("deviceDesc")}</p>
+          {/* squiggle flourish under the page title (decorative) */}
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            viewBox="0 0 160 14"
+            fill="none"
+            className="mt-1.5 w-28 text-leaf"
+          >
+            <path
+              d="M3 10 Q 13 3 23 10 T 43 10 T 63 10 T 83 10 T 103 10 T 123 10 T 143 10 T 157 10"
+              stroke="currentColor"
+              strokeWidth="5"
+              strokeLinecap="round"
+            />
+          </svg>
+          <p className="mt-2 text-base text-slate-600">{t("deviceDesc")}</p>
           {freshness && (
-            <p className="mt-1 text-base text-slate-600">{freshness}</p>
+            <p className="mt-2 inline-flex items-center gap-2 rounded-full border-2 border-slate-300 bg-white px-3.5 py-1 text-base text-slate-600">
+              <span
+                aria-hidden="true"
+                className="h-2.5 w-2.5 shrink-0 rounded-full border border-ink bg-leaf"
+              />
+              {freshness}
+            </p>
           )}
         </div>
         <Button
@@ -212,20 +233,35 @@ export default function DevicePage() {
         />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Card>
-              <div className="mb-3 flex items-center gap-2 font-medium text-slate-900">
-                <Cpu size={18} className="text-sen" aria-hidden="true" />{" "}
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Card className="relative">
+              {/* rotated confetti chip on the card edge (decorative) */}
+              <span
+                aria-hidden="true"
+                className="absolute -top-3 right-5 hidden h-6 w-6 rotate-12 rounded-md border-2 border-ink bg-gold sm:block"
+              />
+              <div className="mb-4 flex items-center gap-2.5 font-display text-lg font-extrabold text-ink">
+                <span
+                  aria-hidden="true"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-ink bg-sen shadow-pop-sm"
+                >
+                  <Cpu
+                    size={20}
+                    strokeWidth={2.5}
+                    className="text-white"
+                    aria-hidden="true"
+                  />
+                </span>{" "}
                 {t("model")}
               </div>
               <dl className="space-y-2 text-base">
                 <div className="flex justify-between gap-3">
                   <dt className="text-slate-600">{t("model")}</dt>
-                  <dd className="font-medium text-slate-800">{device.model}</dd>
+                  <dd className="font-semibold text-ink">{device.model}</dd>
                 </div>
                 <div className="flex justify-between gap-3">
                   <dt className="text-slate-600">{t("firmware")}</dt>
-                  <dd className="font-medium text-slate-800">
+                  <dd className="font-semibold text-ink">
                     v{device.firmwareVersion}
                   </dd>
                 </div>
@@ -233,9 +269,19 @@ export default function DevicePage() {
             </Card>
 
             <Card>
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 font-medium text-slate-900">
-                  <Wifi size={18} className="text-sen" aria-hidden="true" />{" "}
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 font-display text-lg font-extrabold text-ink">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-leaf shadow-pop-sm"
+                  >
+                    <Wifi
+                      size={20}
+                      strokeWidth={2.5}
+                      className="text-ink"
+                      aria-hidden="true"
+                    />
+                  </span>{" "}
                   {t("wifiNetwork")}
                 </div>
                 <Button variant="secondary" onClick={openWifi}>
@@ -245,13 +291,13 @@ export default function DevicePage() {
               <dl className="space-y-2 text-base">
                 <div className="flex justify-between gap-3">
                   <dt className="text-slate-600">{t("wifiName")}</dt>
-                  <dd className="font-medium text-slate-800">
+                  <dd className="font-semibold text-ink">
                     {device.wifi.ssid}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-3">
                   <dt className="text-slate-600">{t("signal")}</dt>
-                  <dd className="flex items-center gap-2 font-medium text-slate-800">
+                  <dd className="flex items-center gap-2 font-semibold text-ink">
                     <span
                       className="flex items-end gap-0.5"
                       aria-hidden="true"
@@ -260,10 +306,12 @@ export default function DevicePage() {
                         <span
                           key={b}
                           className={
-                            "w-1 rounded-sm " +
-                            (b <= bars ? "bg-leaf" : "bg-slate-200")
+                            "w-1.5 rounded-sm border " +
+                            (b <= bars
+                              ? "border-ink bg-leaf"
+                              : "border-slate-300 bg-slate-100")
                           }
-                          style={{ height: 4 + b * 3 }}
+                          style={{ height: 5 + b * 3 }}
                         />
                       ))}
                     </span>
@@ -275,7 +323,7 @@ export default function DevicePage() {
                 </div>
                 <div className="flex justify-between gap-3">
                   <dt className="text-slate-600">{t("ipAddress")}</dt>
-                  <dd className="font-medium text-slate-800">
+                  <dd className="font-semibold text-ink">
                     {device.wifi.ip}
                   </dd>
                 </div>
@@ -283,16 +331,27 @@ export default function DevicePage() {
             </Card>
           </div>
 
-          <h3 className="mb-3 mt-6 font-medium text-slate-900">
+          <h3 className="mb-4 mt-8 flex items-center gap-2.5 font-display text-xl font-extrabold text-ink">
+            <span
+              aria-hidden="true"
+              className="inline-block h-4 w-4 shrink-0 rotate-12 rounded-[4px] border-2 border-ink bg-gold"
+            />
             {t("componentHealth")}
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {device.components.map((c) => (
-              <Card
+              <div
                 key={c.name}
-                className="flex items-center justify-between py-3"
+                className={
+                  "flex items-center justify-between gap-3 rounded-2xl border-2 border-ink px-5 py-3.5 shadow-sticker " +
+                  (c.status === "online"
+                    ? "bg-leaf-light"
+                    : c.status === "offline"
+                      ? "bg-slate-100"
+                      : "bg-red-50")
+                }
               >
-                <span className="text-base font-medium text-slate-800">
+                <span className="text-base font-bold text-ink">
                   {COMPONENT_KEYS[c.name] ? t(COMPONENT_KEYS[c.name]) : c.name}
                 </span>
                 {c.status === "online" ? (
@@ -302,7 +361,7 @@ export default function DevicePage() {
                 ) : (
                   <Badge color="red">{t("compError")}</Badge>
                 )}
-              </Card>
+              </div>
             ))}
           </div>
         </>
@@ -314,7 +373,7 @@ export default function DevicePage() {
         title={t("changeWifi")}
         dismissible={!wifiMutation.busy && !ssid && !password}
       >
-        <form onSubmit={submitWifi} noValidate className="space-y-4">
+        <form onSubmit={submitWifi} noValidate className="space-y-5">
           {wifiMutation.error != null && (
             <Alert>{wifiErrorMessage(wifiMutation.error, t)}</Alert>
           )}
@@ -332,7 +391,7 @@ export default function DevicePage() {
           <div>
             <label
               htmlFor={passwordId}
-              className="mb-1.5 block text-base font-medium text-slate-700"
+              className="mb-1.5 block text-base font-bold text-ink"
             >
               {t("wifiPassword")}
             </label>
@@ -351,8 +410,8 @@ export default function DevicePage() {
                 }
                 autoComplete="off"
                 className={
-                  "w-full rounded-xl border bg-white py-2.5 pl-3.5 pr-14 text-base outline-none transition-colors focus:border-sen focus:ring-2 focus:ring-sen-light " +
-                  (passwordError ? "border-red-400" : "border-slate-300")
+                  "w-full rounded-xl border-2 bg-white py-2.5 pl-3.5 pr-14 text-base outline-none transition-[border-color,box-shadow] focus:border-sen focus:shadow-pop-focus " +
+                  (passwordError ? "border-red-500" : "border-slate-300")
                 }
               />
               <button
@@ -362,7 +421,7 @@ export default function DevicePage() {
                   showPassword ? t("hidePassword") : t("showPassword")
                 }
                 aria-pressed={showPassword}
-                className="absolute right-1.5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-slate-500 hover:text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+                className="absolute right-1.5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-gold-light hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
               >
                 {showPassword ? (
                   <EyeOff size={22} aria-hidden="true" />
@@ -381,7 +440,7 @@ export default function DevicePage() {
               </p>
             )}
           </div>
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-3">
             <Button
               type="button"
               variant="secondary"

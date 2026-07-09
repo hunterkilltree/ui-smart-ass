@@ -56,12 +56,12 @@ function PasswordField({
         onClick={() => setShow((s) => !s)}
         aria-label={show ? t("hidePassword") : t("showPassword")}
         aria-pressed={show}
-        className="absolute right-0 top-[31px] flex h-12 w-12 items-center justify-center rounded-xl text-slate-500 hover:text-slate-700 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sen"
+        className="absolute right-0.5 top-[31px] flex h-12 w-12 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-gold-light hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sen"
       >
         {show ? (
-          <EyeOff size={22} aria-hidden="true" />
+          <EyeOff size={22} strokeWidth={2.5} aria-hidden="true" />
         ) : (
-          <Eye size={22} aria-hidden="true" />
+          <Eye size={22} strokeWidth={2.5} aria-hidden="true" />
         )}
       </button>
     </div>
@@ -165,7 +165,7 @@ function SignInForm() {
         <div className="flex justify-end">
           <Link
             href="/forgot-password"
-            className="rounded text-base text-sen hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+            className="inline-block rounded-md py-1 text-base font-bold text-sen underline decoration-2 underline-offset-4 transition-colors hover:text-sen-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
           >
             {t("forgotPassword")}
           </Link>
@@ -173,16 +173,34 @@ function SignInForm() {
         <Button type="submit" loading={submit.busy} className="w-full">
           {t("signIn")}
         </Button>
+        {/* playful squiggle divider between action and footer links */}
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          viewBox="0 0 160 14"
+          fill="none"
+          className="mx-auto w-24 text-gold"
+        >
+          <path
+            d="M3 10 Q 13 3 23 10 T 43 10 T 63 10 T 83 10 T 103 10 T 123 10 T 143 10 T 157 10"
+            stroke="currentColor"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+        </svg>
         <p className="text-center text-base text-slate-600">
           {t("noAccount")}{" "}
           <Link
             href="/sign-up"
-            className="rounded text-sen hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+            className="rounded-md font-bold text-sen underline decoration-2 underline-offset-4 transition-colors hover:text-sen-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
           >
             {t("signUp")}
           </Link>
         </p>
-        <p className="text-center text-sm text-slate-500">{t("signInHint")}</p>
+        {/* mock-only dev hint, styled as a dashed "sticky note" chip */}
+        <p className="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-2.5 text-center text-sm text-slate-600">
+          {t("signInHint")}
+        </p>
       </form>
     </AuthShell>
   );

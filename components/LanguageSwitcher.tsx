@@ -8,7 +8,8 @@ export function LanguageSwitcher() {
     <div
       role="group"
       aria-label={t("language")}
-      className="inline-flex overflow-hidden rounded-full border border-sen/30 text-sm font-semibold"
+      /* chunky segmented pill: 2px ink border + small hard shadow */
+      className="inline-flex overflow-hidden rounded-full border-2 border-ink text-sm font-bold shadow-pop-sm"
     >
       {(["vi", "en"] as const).map((l) => (
         <button
@@ -21,7 +22,7 @@ export function LanguageSwitcher() {
             // overflow-hidden doesn't clip the focus ring
             lang === l
               ? "flex min-h-11 min-w-11 items-center justify-center bg-sen px-3.5 text-white transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
-              : "flex min-h-11 min-w-11 items-center justify-center bg-white px-3.5 text-slate-600 transition-colors hover:bg-sen-light focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sen"
+              : "flex min-h-11 min-w-11 items-center justify-center bg-white px-3.5 text-slate-600 transition-colors hover:bg-gold-light hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sen"
           }
         >
           {l.toUpperCase()}

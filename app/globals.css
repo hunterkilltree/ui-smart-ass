@@ -4,23 +4,174 @@
  * into unresolvable CSS and break the build. */
 @source not "../design-prompts";
 
-/* SEN brand palette — from the lotus logo.
- * These variables are the single source of truth for brand colors:
- * reference them (var(--color-*) / Tailwind `sen`, `lotus`, `leaf`, …)
- * instead of repeating hex literals. */
+/* ------------------------------------------------------------------ *
+ * SEN — "Playful Geometric" token layer.
+ *
+ * The variable NAMES are unchanged (sen, lotus, leaf, cream, gold, ink)
+ * so every existing `text-sen` / `bg-lotus-light` / … class keeps working;
+ * only the VALUES moved to the approved Playful Geometric palette
+ * (design-prompts/playful-geometric.md).
+ *
+ * Color contract (keep this true when picking classes):
+ *  - `*-dark` shades and `sen` are AA-safe as TEXT on white and cream.
+ *  - base bright shades (`lotus`, `leaf`, `gold`, `sen-bright`) are for
+ *    BACKGROUNDS and decorations only — put ink text on top, never use
+ *    them as text colors.
+ *  - `*-light` shades are surface tints (chips, alert/toast backgrounds).
+ * ------------------------------------------------------------------ */
 @theme {
-  --color-sen: #2f6bb3; /* SEN blue */
-  --color-sen-dark: #24568f;
-  --color-sen-light: #e3edf8;
-  --color-lotus: #f27da5; /* lotus pink — decorative use only (fails AA as text) */
-  --color-lotus-dark: #a8446c; /* darkened for 4.5:1+ AA text on white AND cream */
-  --color-lotus-light: #fdeaf1;
-  --color-leaf: #5ea53c; /* leaf green — decorative (signal bars, logo) */
-  --color-leaf-dark: #3c7325; /* the single "success" green for text/badges; AA on white, cream and leaf-light */
-  --color-leaf-light: #e8f4df; /* success surface tint */
-  --color-cream: #faf3ec; /* warm cream background */
-  --color-gold: #c9a24b; /* circuit gold accent */
-  --color-ink: #1e293b; /* default body text — ~13:1 on cream, passes AA/AAA */
+  /* -- Typography ------------------------------------------------------ */
+  /* The spec families (Outfit / Plus Jakarta Sans) are self-hosted via
+   * next/font in app/fonts.ts (build-time download, no runtime Google
+   * requests) and exposed as --font-outfit / --font-plus-jakarta on <html>.
+   * The local stacks stay behind them as fallbacks. */
+  /* Body: geometric-humanist. Overrides Tailwind's default `font-sans`. */
+  --font-sans: var(--font-plus-jakarta), "Plus Jakarta Sans", "Avenir Next",
+    "Segoe UI", "Helvetica Neue", system-ui, -apple-system, sans-serif;
+  /* Headings: rounded geometric. Use as `font-display` + bold/extrabold.
+   * Outfit has no Vietnamese subset, so Plus Jakarta Sans sits right
+   * behind it for per-glyph fallback on Vietnamese diacritics. */
+  --font-display: var(--font-outfit), var(--font-plus-jakarta), "Outfit",
+    "Nunito", "Quicksand", "Avenir Next Rounded", "Avenir Next",
+    "Trebuchet MS", ui-rounded, system-ui, sans-serif;
+
+  /* -- Brand / action (violet, was SEN blue) --------------------------- */
+  --color-sen: #7c3aed; /* primary action; 5.7:1 on white/cream — OK as text AND as bg under white text */
+  --color-sen-dark: #6d28d9; /* hover/pressed; also info text on sen-light */
+  --color-sen-light: #ede9fe; /* violet tint surface (chips, info alerts) */
+  --color-sen-bright: #8b5cf6; /* spec accent — DECORATIVE fills only (4.1:1, fails AA as text) */
+
+  /* -- Pink (playful pop) ---------------------------------------------- */
+  --color-lotus: #f472b6; /* decorative shapes/fills only (fails AA as text) */
+  --color-lotus-dark: #be185d; /* 6:1 on white/cream — the pink for text */
+  --color-lotus-light: #fce7f3; /* pink tint surface */
+
+  /* -- Mint (freshness / success) --------------------------------------- */
+  --color-leaf: #34d399; /* decorative fills (signal bars, confetti) — ink text on top */
+  --color-leaf-dark: #047857; /* success text; AA on white, cream and leaf-light */
+  --color-leaf-light: #d1fae5; /* success surface tint */
+
+  /* -- Amber (optimism) -------------------------------------------------- */
+  --color-gold: #fbbf24; /* decorative fill + secondary hover fill — ink text on top */
+  --color-gold-light: #fef3c7; /* soft amber tint (ghost hover, chips) */
+
+  /* -- Neutrals ----------------------------------------------------------- */
+  --color-cream: #fffdf5; /* warm paper background */
+  --color-ink: #1e293b; /* body text + hard borders/shadows; ~13:1 on cream */
+
+  /* -- "Pop" hard shadows (no blur — sticker / cut-paper feel) ---------- */
+  --shadow-pop-sm: 3px 3px 0 0 #1e293b; /* small chips, icon coins */
+  --shadow-pop: 4px 4px 0 0 #1e293b; /* buttons, toasts */
+  --shadow-pop-lg: 6px 6px 0 0 #1e293b; /* modals, hero cards */
+  --shadow-sticker: 6px 6px 0 0 #e2e8f0; /* soft slate offset — default Card */
+  --shadow-sticker-lg: 8px 8px 0 0 #e2e8f0; /* featured cards */
+  --shadow-pop-focus: 4px 4px 0 0 #ddd6fe; /* input focus (violet-200 hard shadow) */
+
+  /* -- Motion -------------------------------------------------------------- */
+  /* Bouncy overshoot easing — `ease-bounce` utility. Pair with the
+   * pop-press/pop-in utilities below, which self-disable for
+   * prefers-reduced-motion. */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Keyframes for the playful motion utilities (defined once, gated per
+ * utility below so reduced-motion users never see them). */
+@keyframes pg-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(3deg);
+  }
+  75% {
+    transform: rotate(-3deg);
+  }
+}
+@keyframes pg-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes pg-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Interactive "pop": hard ink shadow that lifts on hover and collapses on
+ * press (the signature button feel). Add to any bordered, filled control.
+ * Reduced motion: shadow states still change (non-motion cue) but the
+ * element never translates or animates. */
+@utility pop-press {
+  box-shadow: var(--shadow-pop);
+  transition:
+    transform 200ms var(--ease-bounce),
+    box-shadow 200ms var(--ease-bounce),
+    background-color 150ms ease,
+    color 150ms ease;
+  &:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-pop-lg);
+  }
+  &:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 0 var(--color-ink);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    &:hover:not(:disabled),
+    &:active:not(:disabled) {
+      transform: none;
+    }
+  }
+}
+
+/* Entrance "pop" (scale 0.9 -> 1 with bounce). Static under reduced motion. */
+@utility pop-in {
+  animation: pg-pop-in 0.5s var(--ease-bounce) both;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+/* Icon wiggle on hover of the utility's own element. For "wiggle the icon
+ * when the card is hovered", put the class on the icon wrapper and rely on
+ * the card's hover styles instead. Disabled under reduced motion. */
+@utility wiggle-on-hover {
+  &:hover {
+    animation: pg-wiggle 0.5s ease-in-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &:hover {
+      animation: none;
+    }
+  }
+}
+
+/* Infinite keyword marquee (decorative strip). Apply to a `flex w-max`
+ * track that contains TWO copies of the row — translating -50% loops
+ * seamlessly. Static under reduced motion. */
+@utility marquee-track {
+  animation: pg-marquee 28s linear infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+/* Dot-grid texture (Memphis "strict formation" dots). Layer over white or
+ * cream surfaces; purely decorative, keep text off it or inside a card. */
+@utility pattern-dots {
+  background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+  background-size: 18px 18px;
 }
 
 /* Slightly larger base size — senior-friendly readability.

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { MailCheck } from "lucide-react";
 import { AuthAPI } from "@/lib/be";
 import { useMutation } from "@/lib/useQuery";
 import { tApiError, useI18n } from "@/lib/i18n";
@@ -45,21 +46,32 @@ export default function ForgotPasswordPage() {
     <AuthShell title={t("resetPassword")}>
       {resetUrl ? (
         <div className="space-y-4">
+          {/* playful success accent: mail-check "coin" with confetti dots */}
+          <div
+            aria-hidden="true"
+            className="pop-in flex items-center justify-center gap-3"
+          >
+            <span className="h-3 w-3 rotate-12 rounded-[3px] border-2 border-ink bg-gold" />
+            <span className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-ink bg-leaf shadow-pop-sm">
+              <MailCheck size={26} strokeWidth={2.5} className="text-ink" />
+            </span>
+            <span className="h-3 w-3 rounded-full border-2 border-ink bg-lotus" />
+          </div>
           <Alert kind="success">{t("resetLinkSent")}</Alert>
           {/* Mock-only dev hint: no real email exists yet, so surface the
               link the email would contain. Remove with the real backend. */}
-          <p className="text-center text-sm text-slate-500">
+          <p className="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-2.5 text-center text-sm text-slate-600">
             {t("forgotHintMock")}{" "}
             <Link
               href={resetUrl}
-              className="rounded text-sen underline hover:text-sen-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+              className="rounded-md font-bold text-sen underline decoration-2 underline-offset-2 transition-colors hover:text-sen-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
             >
               {t("openResetLink")}
             </Link>
           </p>
           <Link
             href="/sign-in"
-            className="block rounded text-center text-base text-sen hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+            className="block rounded-md py-2 text-center text-base font-bold text-sen underline decoration-2 underline-offset-4 transition-colors hover:text-sen-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
           >
             {t("backToSignIn")}
           </Link>
@@ -86,7 +98,7 @@ export default function ForgotPasswordPage() {
           </Button>
           <Link
             href="/sign-in"
-            className="block rounded text-center text-base text-sen hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+            className="block rounded-md py-2 text-center text-base font-bold text-sen underline decoration-2 underline-offset-4 transition-colors hover:text-sen-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
           >
             {t("backToSignIn")}
           </Link>

@@ -74,6 +74,20 @@ function channelErrorMessage(code: string, t: Translate): string {
 }
 
 /**
+ * Playful Geometric accents for the channel cards, rotated deterministically
+ * by list index (no randomness — SSR/client markup stays identical).
+ * Full class literals so Tailwind's scanner picks them up.
+ * Bright fills are decoration-only: ink icon on gold/lotus/leaf, white only
+ * on the AA-safe violet `bg-sen`.
+ */
+const CHANNEL_ACCENTS = [
+  { coin: "bg-sen text-white", chip: "bg-gold" },
+  { coin: "bg-lotus text-ink", chip: "bg-leaf" },
+  { coin: "bg-gold text-ink", chip: "bg-sen-bright" },
+  { coin: "bg-leaf text-ink", chip: "bg-lotus" },
+] as const;
+
+/**
  * One credential input. Secret-ish fields render as password inputs with a
  * show/hide toggle. Module-scope component so inputs keep focus across
  * page re-renders.
@@ -101,7 +115,7 @@ function CredentialField({
     <div>
       <label
         htmlFor={inputId}
-        className="mb-1.5 block text-base font-medium text-slate-700"
+        className="mb-1.5 block text-base font-bold text-ink"
       >
         {credFieldLabel(field, t)}
       </label>
@@ -122,7 +136,7 @@ function CredentialField({
             onClick={onToggleVisible}
             aria-label={visible ? t("hideSecret") : t("showSecret")}
             aria-pressed={visible}
-            className="absolute right-0.5 top-[1px] flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+            className="absolute right-0.5 top-[1px] flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-gold-light hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
           >
             {visible ? (
               <EyeOff size={20} aria-hidden="true" />
@@ -247,20 +261,40 @@ export default function ContactsPage() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-slate-900">
-        {t("contactsTitle")}
-      </h2>
-      <p className="mb-5 mt-1 text-base text-slate-600">{t("contactsDesc")}</p>
+      <div>
+        <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink">
+          {t("contactsTitle")}
+        </h2>
+        {/* squiggle underline flourish */}
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          viewBox="0 0 160 14"
+          fill="none"
+          className="mt-1.5 w-28 text-lotus"
+        >
+          <path
+            d="M3 10 Q 13 3 23 10 T 43 10 T 63 10 T 83 10 T 103 10 T 123 10 T 143 10 T 157 10"
+            stroke="currentColor"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+        </svg>
+        <p className="mb-6 mt-2 text-base text-slate-600">{t("contactsDesc")}</p>
+      </div>
 
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {[0, 1, 2].map((i) => (
             <Card key={i} className="flex items-center justify-between gap-3">
-              <div className="flex-1 space-y-2.5">
-                <Skeleton className="h-6 w-32" />
-                <Skeleton className="h-7 w-28" />
+              <div className="flex flex-1 items-center gap-3">
+                <Skeleton className="h-12 w-12 shrink-0 rounded-full" />
+                <div className="flex-1 space-y-2.5">
+                  <Skeleton className="h-6 w-32" />
+                  <Skeleton className="h-7 w-28" />
+                </div>
               </div>
-              <Skeleton className="h-11 w-36 shrink-0" />
+              <Skeleton className="h-11 w-36 shrink-0 rounded-full" />
             </Card>
           ))}
         </div>
@@ -292,44 +326,61 @@ export default function ContactsPage() {
             </Alert>
           )}
           <div className="grid gap-4 sm:grid-cols-2">
-            {channels.map((ch) => (
-              <Card
-                key={ch.id}
-                className="flex items-center justify-between gap-3"
-              >
-                <div>
-                  <h3 className="mb-1.5 text-lg font-semibold text-slate-900">
-                    {ch.name}
-                  </h3>
+            {channels.map((ch, i) => {
+              const accent = CHANNEL_ACCENTS[i % CHANNEL_ACCENTS.length];
+              return (
+                <Card
+                  key={ch.id}
+                  className="pop-in relative flex items-center justify-between gap-3"
+                >
+                  {/* confetti chip perched on the sticker's top edge */}
+                  <span
+                    aria-hidden="true"
+                    className={`absolute -top-3 right-5 hidden h-6 w-6 rotate-12 rounded-md border-2 border-ink lg:block ${accent.chip}`}
+                  />
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                    {/* channel icon coin (decorative — the name carries meaning) */}
+                    <span
+                      aria-hidden="true"
+                      className={`wiggle-on-hover flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-ink shadow-pop-sm ${accent.coin}`}
+                    >
+                      <MessageCircle size={22} strokeWidth={2.5} />
+                    </span>
+                    <div className="min-w-0">
+                      <h3 className="mb-1.5 font-display text-lg font-bold text-ink">
+                        {ch.name}
+                      </h3>
+                      {ch.connected ? (
+                        <Badge color="green">{t("connected")}</Badge>
+                      ) : ch.error ? (
+                        <Badge color="red">{t("channelError")}</Badge>
+                      ) : (
+                        <Badge color="gray">{t("notConnected")}</Badge>
+                      )}
+                      {ch.error && (
+                        <p className="mt-2 text-base text-red-700">
+                          {channelErrorMessage(ch.error, t)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                   {ch.connected ? (
-                    <Badge color="green">{t("connected")}</Badge>
-                  ) : ch.error ? (
-                    <Badge color="red">{t("channelError")}</Badge>
+                    <Button
+                      variant="secondary"
+                      className="shrink-0"
+                      onClick={() => setConfirming(ch)}
+                      loading={disconnectM.busy && confirming?.id === ch.id}
+                    >
+                      <Unplug size={18} aria-hidden="true" /> {t("disconnect")}
+                    </Button>
                   ) : (
-                    <Badge color="gray">{t("notConnected")}</Badge>
+                    <Button className="shrink-0" onClick={() => openConnect(ch)}>
+                      <Plug size={18} aria-hidden="true" /> {t("connect")}
+                    </Button>
                   )}
-                  {ch.error && (
-                    <p className="mt-2 text-base text-red-700">
-                      {channelErrorMessage(ch.error, t)}
-                    </p>
-                  )}
-                </div>
-                {ch.connected ? (
-                  <Button
-                    variant="secondary"
-                    className="shrink-0"
-                    onClick={() => setConfirming(ch)}
-                    loading={disconnectM.busy && confirming?.id === ch.id}
-                  >
-                    <Unplug size={18} aria-hidden="true" /> {t("disconnect")}
-                  </Button>
-                ) : (
-                  <Button className="shrink-0" onClick={() => openConnect(ch)}>
-                    <Plug size={18} aria-hidden="true" /> {t("connect")}
-                  </Button>
-                )}
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         </>
       )}
@@ -342,7 +393,7 @@ export default function ContactsPage() {
         title={`${t("connect")} ${editing?.name ?? ""}`}
         dismissible={!connectM.busy && !hasTypedCreds}
       >
-        <form onSubmit={submitConnect} noValidate className="space-y-4">
+        <form onSubmit={submitConnect} noValidate className="space-y-5">
           {connectM.error != null && (
             <Alert>{contactsErrorMessage(connectM.error, t)}</Alert>
           )}
@@ -365,7 +416,7 @@ export default function ContactsPage() {
               }
             />
           ))}
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-3 pt-1">
             <Button
               type="button"
               variant="secondary"
