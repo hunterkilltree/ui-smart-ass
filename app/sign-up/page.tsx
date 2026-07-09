@@ -1,79 +1,221 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
+import { ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import { useI18n } from "@/lib/i18n";
+import { useMutation } from "@/lib/useQuery";
+import { tApiError, useI18n } from "@/lib/i18n";
 import { AuthShell } from "@/components/AuthShell";
-import { Button, Input, Alert } from "@/components/ui";
+import { Button, Input, Alert, FullPageSpinner } from "@/components/ui";
 
-export default function SignUpPage() {
-  const { signUp } = useAuth();
+const EMAIL_RE = /^\S+@\S+\.\S+$/;
+
+/** Only allow internal paths as post-auth destinations. */
+function safeNext(next: string | null): string {
+  if (next && next.startsWith("/") && !next.startsWith("//")) return next;
+  return "/dashboard";
+}
+
+/** Password input with a show/hide toggle (Eye/EyeOff), built on Input. */
+function PasswordField({
+  label,
+  value,
+  onChange,
+  onBlur,
+  error,
+  autoComplete,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  onBlur?: () => void;
+  error?: string;
+  autoComplete?: string;
+}) {
   const { t } = useI18n();
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative">
+      <Input
+        label={label}
+        type={show ? "text" : "password"}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+        error={error}
+        autoComplete={autoComplete}
+        required
+        className="pr-14"
+      />
+      {/* 48px toggle target, aligned over the input row (below the label) */}
+      <button
+        type="button"
+        onClick={() => setShow((s) => !s)}
+        aria-label={show ? t("hidePassword") : t("showPassword")}
+        aria-pressed={show}
+        className="absolute right-0 top-[31px] flex h-12 w-12 items-center justify-center rounded-xl text-slate-500 hover:text-slate-700 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sen"
+      >
+        {show ? (
+          <EyeOff size={22} aria-hidden="true" />
+        ) : (
+          <Eye size={22} aria-hidden="true" />
+        )}
+      </button>
+    </div>
+  );
+}
+
+function SignUpForm() {
+  const { user, loading, signUp } = useAuth();
+  const { t } = useI18n();
+  const router = useRouter();
+  // Deep link preserved by the dashboard guard (?next=/dashboard/...).
+  const next = useSearchParams().get("next");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{
+    email?: string;
+    password?: string;
+    confirm?: string;
+  }>({});
+
+  const validateEmail = (value: string) =>
+    EMAIL_RE.test(value.trim()) ? undefined : t("emailInvalid");
+  const validatePassword = (value: string) =>
+    value.length >= 6 ? undefined : t("passwordTooShort");
+  const validateConfirm = (confirmValue: string, passwordValue: string) =>
+    confirmValue === passwordValue ? undefined : t("passwordMismatch");
+
+  const submit = useMutation(
+    async (args: { email: string; password: string }) => {
+      // signUp stores the session and router.replace()s to the destination.
+      await signUp(args.email, args.password, safeNext(next));
+    }
+  );
+
+  // Already signed in (bookmark, Back button): skip the form entirely.
+  useEffect(() => {
+    if (!loading && user) router.replace(safeNext(next));
+  }, [loading, user, next, router]);
+
+  if (loading || user) return <FullPageSpinner />;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    if (password.length < 6) {
-      setError(t("passwordTooShort"));
-      return;
+    const errs = {
+      email: validateEmail(email),
+      password: validatePassword(password),
+      confirm: validateConfirm(confirm, password),
+    };
+    setFieldErrors(errs);
+    if (errs.email || errs.password || errs.confirm) return;
+    await submit.mutate({ email, password });
+  };
+
+  const submitErrorMessage = (err: unknown) => {
+    if (err instanceof ApiError) {
+      if (err.message === "invalid_email") return t("emailInvalid");
+      if (err.message === "weak_password") return t("passwordTooShort");
     }
-    if (password !== confirm) {
-      setError(t("passwordMismatch"));
-      return;
-    }
-    setBusy(true);
-    try {
-      await signUp(email, password);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error");
-      setBusy(false);
-    }
+    return tApiError(err, t);
   };
 
   return (
     <AuthShell title={t("signUp")}>
-      <form onSubmit={onSubmit} className="space-y-4">
-        {error && <Alert>{error}</Alert>}
+      <form onSubmit={onSubmit} noValidate className="space-y-4">
+        {submit.error != null && (
+          <Alert>{submitErrorMessage(submit.error)}</Alert>
+        )}
         <Input
           label={t("email")}
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (fieldErrors.email) {
+              setFieldErrors((prev) => ({
+                ...prev,
+                email: validateEmail(e.target.value),
+              }));
+            }
+          }}
+          onBlur={() =>
+            setFieldErrors((prev) => ({ ...prev, email: validateEmail(email) }))
+          }
+          error={fieldErrors.email}
           required
           autoComplete="email"
         />
-        <Input
+        <PasswordField
           label={t("password")}
-          type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
+          onChange={(value) => {
+            setPassword(value);
+            setFieldErrors((prev) => ({
+              ...prev,
+              password: prev.password ? validatePassword(value) : prev.password,
+              // A password edit can fix (or break) the confirmation match.
+              confirm: prev.confirm
+                ? validateConfirm(confirm, value)
+                : prev.confirm,
+            }));
+          }}
+          onBlur={() =>
+            setFieldErrors((prev) => ({
+              ...prev,
+              password: validatePassword(password),
+            }))
+          }
+          error={fieldErrors.password}
           autoComplete="new-password"
         />
-        <Input
+        <PasswordField
           label={t("confirmPassword")}
-          type="password"
           value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          required
+          onChange={(value) => {
+            setConfirm(value);
+            if (fieldErrors.confirm) {
+              setFieldErrors((prev) => ({
+                ...prev,
+                confirm: validateConfirm(value, password),
+              }));
+            }
+          }}
+          onBlur={() =>
+            setFieldErrors((prev) => ({
+              ...prev,
+              confirm: validateConfirm(confirm, password),
+            }))
+          }
+          error={fieldErrors.confirm}
           autoComplete="new-password"
         />
-        <Button type="submit" disabled={busy} className="w-full">
-          {busy ? t("loading") : t("signUp")}
+        <Button type="submit" loading={submit.busy} className="w-full">
+          {t("signUp")}
         </Button>
-        <p className="text-center text-sm text-slate-500">
+        <p className="text-center text-base text-slate-600">
           {t("haveAccount")}{" "}
-          <Link href="/sign-in" className="text-sen hover:underline">
+          <Link
+            href="/sign-in"
+            className="rounded text-sen hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+          >
             {t("signIn")}
           </Link>
         </p>
       </form>
     </AuthShell>
+  );
+}
+
+export default function SignUpPage() {
+  // useSearchParams requires a Suspense boundary during static prerender.
+  return (
+    <Suspense fallback={null}>
+      <SignUpForm />
+    </Suspense>
   );
 }

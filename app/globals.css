@@ -1,25 +1,42 @@
 @import "tailwindcss";
+/* design-prompts/ holds prose docs with literal class-like strings (e.g.
+ * `bg-[url(...)]`) that Tailwind 4's source scanner would otherwise compile
+ * into unresolvable CSS and break the build. */
+@source not "../design-prompts";
 
-/* SEN brand palette — from the lotus logo */
+/* SEN brand palette — from the lotus logo.
+ * These variables are the single source of truth for brand colors:
+ * reference them (var(--color-*) / Tailwind `sen`, `lotus`, `leaf`, …)
+ * instead of repeating hex literals. */
 @theme {
   --color-sen: #2f6bb3; /* SEN blue */
   --color-sen-dark: #24568f;
   --color-sen-light: #e3edf8;
-  --color-lotus: #f27da5; /* lotus pink */
-  --color-lotus-dark: #d95f8b;
+  --color-lotus: #f27da5; /* lotus pink — decorative use only (fails AA as text) */
+  --color-lotus-dark: #a8446c; /* darkened for 4.5:1+ AA text on white AND cream */
   --color-lotus-light: #fdeaf1;
-  --color-leaf: #5ea53c; /* leaf green */
-  --color-leaf-light: #e8f4df;
+  --color-leaf: #5ea53c; /* leaf green — decorative (signal bars, logo) */
+  --color-leaf-dark: #3c7325; /* the single "success" green for text/badges; AA on white, cream and leaf-light */
+  --color-leaf-light: #e8f4df; /* success surface tint */
   --color-cream: #faf3ec; /* warm cream background */
   --color-gold: #c9a24b; /* circuit gold accent */
+  --color-ink: #1e293b; /* default body text — ~13:1 on cream, passes AA/AAA */
 }
 
-/* Slightly larger base size — senior-friendly readability */
+/* Slightly larger base size — senior-friendly readability.
+ * Typography rules for this audience:
+ *  - content/body text and form controls: `text-base` (17px) minimum;
+ *    reserve `text-sm` for secondary text and `text-xs` for true metadata.
+ *  - secondary text color: `slate-500` minimum on white (never `slate-400`,
+ *    ~2.6:1); prefer `slate-600` when it sits on the cream background. */
 html {
   font-size: 17px;
+  /* Light-only app: keep native controls (select, audio, scrollbars) light
+   * even when the OS/browser prefers dark. */
+  color-scheme: light;
 }
 
 body {
   background: var(--color-cream);
-  color: #1e293b;
+  color: var(--color-ink);
 }

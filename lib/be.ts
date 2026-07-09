@@ -38,10 +38,21 @@ export const AuthAPI = {
 
   me: () => api<User>("/auth/me"),
 
+  /**
+   * Mock BE sends no real email; `resetUrl` is the reset link the email
+   * would contain (`/reset-password?token=mock-token`) so the UI can show
+   * a dev hint.
+   */
   forgotPassword: (email: string) =>
-    api<{ ok: boolean }>("/auth/forgot-password", {
+    api<{ ok: boolean; resetUrl?: string }>("/auth/forgot-password", {
       method: "POST",
       body: JSON.stringify({ email }),
+    }),
+
+  resetPassword: (token: string, password: string) =>
+    api<{ ok: boolean }>("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ token, password }),
     }),
 };
 
@@ -65,10 +76,16 @@ export const VoiceAPI = {
 
   samples: () => api<VoiceSample[]>("/voice-training/samples"),
 
-  submitSample: (promptId: string, audio: Blob, filename = "sample.webm") => {
+  submitSample: (
+    promptId: string,
+    audio: Blob,
+    lang?: "vi" | "en",
+    filename = "sample.webm"
+  ) => {
     const form = new FormData();
     form.append("promptId", promptId);
     form.append("audio", audio, filename);
+    if (lang) form.append("lang", lang);
     return api<VoiceSample>("/voice-training/samples", {
       method: "POST",
       body: form,
@@ -80,13 +97,19 @@ export interface LogsQuery {
   direction?: "in" | "out";
   status?: string;
   limit?: number;
+  /** ISO timestamp — only logs at or after this instant. */
+  from?: string;
+  /** ISO timestamp — only logs at or before this instant. */
+  to?: string;
 }
 
 export const LogsAPI = {
-  list: ({ direction, status, limit = 50 }: LogsQuery = {}) => {
+  list: ({ direction, status, limit = 50, from, to }: LogsQuery = {}) => {
     const params = new URLSearchParams({ limit: String(limit) });
     if (direction) params.set("direction", direction);
     if (status) params.set("status", status);
+    if (from) params.set("from", from);
+    if (to) params.set("to", to);
     return api<LogEntry[]>(`/logs?${params}`);
   },
 };

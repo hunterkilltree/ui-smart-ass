@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { decodeToken } from "@/lib/mock/token";
+import { requireUser, simulateLatency, unauthorized } from "@/lib/mock/util";
 
 export async function GET(req: Request) {
-  const user = decodeToken(req.headers.get("authorization"));
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  await simulateLatency("/api/auth/me");
+  const user = requireUser(req);
+  if (!user) return unauthorized();
   return NextResponse.json(user);
 }
