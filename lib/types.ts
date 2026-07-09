@@ -27,6 +27,10 @@ export interface VoiceSample {
   promptId: string;
   status: SampleStatus;
   createdAt: string;
+  /** Which language variant of the prompt was read aloud. */
+  lang?: "vi" | "en";
+  /** Machine-readable reason code, present when status === "failed". */
+  failureReason?: string | null;
 }
 
 export interface LogEntry {

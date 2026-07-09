@@ -40,65 +40,104 @@ After login, user lands on a dashboard with 4 tabs: **Contacts**, **Voice Traini
 - Component health list (mic, speaker, sensors, etc.) with online/offline/error state
 
 ## 5. Mock API (for FE development before real BE is ready)
-All endpoints served from a local mock (e.g. `/app/api/mock/*` route handlers, or MSW). Base path: `/api`.
+All endpoints served from local route handlers under `app/api/*`. Base path: `/api`.
 
-### Auth
+**Conventions (all endpoints):**
+- **Errors are machine-readable codes**, never English prose: `{ error: "<snake_case_code>" }`. The client maps codes to localized copy (vi/en) — codes must never be shown raw to users.
+- **Auth:** every endpoint except `/api/auth/*` requires `Authorization: Bearer <token>`. Missing/invalid token → `401 { error: "unauthorized" }`. `/api/logs` additionally requires the `developer` role → otherwise `403 { error: "forbidden" }`.
+- **Latency:** every handler adds a deterministic 150–400 ms artificial delay (derived from the path) so loading states are exercised.
+- **Serverless-safe state:** the store lives on `globalThis` and uses **no background timers** — time-based transitions (voice-sample processing) are derived lazily on read from `createdAt`, so behavior is identical on Vercel serverless. In-memory state may reset between instances/deploys; the FE must tolerate that.
+
+### Auth (public — no token required)
 ```
 POST /api/auth/sign-up
   body: { email: string, password: string }
   200: { user: { id: string, email: string, role: "user"|"developer" }, token: string }
-  400: { error: string }
+  400: { error: "invalid_email" | "weak_password" }        // password >= 6 chars
+  Mock rules: email containing "dev" → developer role; user id is a stable
+  hash of the email (same email always gets the same id).
 
 POST /api/auth/sign-in
   body: { email: string, password: string }
   200: { user: { id, email, role }, token: string }
-  401: { error: "Invalid credentials" }
+  401: { error: "invalid_credentials" }                    // password >= 6 chars
+  Mock rules: any email signs in; same stable-id and role rules as sign-up.
 
 GET /api/auth/me
   header: Authorization: Bearer <token>
   200: { id, email, role }
+  401: { error: "unauthorized" }
+
+POST /api/auth/forgot-password
+  body: { email: string }
+  200: { ok: true, resetUrl: "/reset-password?token=mock-token" }
+  400: { error: "email_required" }
+  Mock rules: no email is sent; `resetUrl` is the link the email would
+  contain, so the UI can render it as a dev hint.
+
+POST /api/auth/reset-password
+  body: { token: string, password: string }
+  200: { ok: true }
+  400: { error: "invalid_token" | "expired_token" | "weak_password" }
+  Mock rules: token "expired" → expired_token; any other non-empty token is
+  accepted; password >= 6 chars.
 ```
 
-### Contacts
+### Contacts (auth required)
 ```
 GET /api/contacts
   200: [
-    { id: "zalo", name: "Zalo", connected: true, credentialFields: ["oaId","accessToken"] },
-    { id: "messenger", name: "Messenger", connected: false, credentialFields: ["pageId","pageAccessToken"] }
+    { id: "zalo", name: "Zalo", connected: true, credentialFields: ["oaId","accessToken"], error: null },
+    { id: "messenger", name: "Messenger", connected: false, credentialFields: ["pageId","pageAccessToken"], error: "invalid_credentials" }
   ]
+  // `error` is a machine-readable code set when the last connect attempt was
+  // rejected. Status indicator: connected → "connected"; error → "error";
+  // else → "not connected".
 
 POST /api/contacts/:id/connect
   body: { credentials: { [field: string]: string } }
   200: { id, connected: true }
-  400: { error: "Invalid credentials" }
+  400: { error: "missing_credentials" }   // any required field empty/absent
+  400: { error: "invalid_credentials" }   // provider rejected — see trigger
+  404: { error: "channel_not_found" }
+  Mock trigger for the error state: submit any credential value equal to
+  "bad" or "expired" (e.g. Zalo oaId = "bad") → the channel is persisted as
+  { connected: false, error: "invalid_credentials" } so the "error" status
+  is reachable and visible in the contacts list.
 
 POST /api/contacts/:id/disconnect
-  200: { id, connected: false }
+  200: { id, connected: false }           // also clears `error`
+  404: { error: "channel_not_found" }
 ```
 
-### Voice Training
+### Voice Training (auth required)
 ```
 GET /api/voice-training/prompts
   200: [
     { id: "p1", text_vi: "Xin chào, tôi là trợ lý ảo thông minh.", text_en: "Hello, I am your smart virtual assistant." },
-    { id: "p2", text_vi: "Hôm nay thời tiết thế nào?", text_en: "How is the weather today?" },
-    { id: "p3", text_vi: "Vui lòng bật đèn phòng khách.", text_en: "Please turn on the living room light." }
+    ...
   ]
 
 POST /api/voice-training/samples
-  multipart/form-data: { promptId: string, audio: File }
-  200: { id: string, promptId: string, status: "pending", createdAt: string }
+  multipart/form-data: { promptId: string, audio: File, lang?: "vi"|"en" }
+  // `lang` records which language variant of the prompt was read aloud.
+  200: { id: string, promptId: string, status: "pending", createdAt: string, lang?: "vi"|"en" }
+  400: { error: "missing_fields" | "unknown_prompt" | "invalid_lang" }
 
 GET /api/voice-training/samples
   200: [
-    { id: "s1", promptId: "p1", status: "processed", createdAt: "..." },
-    { id: "s2", promptId: "p2", status: "pending", createdAt: "..." }
+    { id: "s1", promptId: "p1", status: "processed", createdAt: "...", lang: "vi" },
+    { id: "s0", promptId: "p3", status: "failed", failureReason: "audio_unclear", createdAt: "...", lang: "vi" }
   ]
+  // Sorted newest first. Status is derived lazily (serverless-safe): a sample
+  // younger than 8 s is "pending"; after that it becomes "processed", except
+  // a deterministic subset (hash(id) % 5 === 0) becomes "failed" with a
+  // machine-readable `failureReason` (currently "audio_unclear").
 ```
 
-### Logs (developer only)
+### Logs (auth + developer role required)
 ```
-GET /api/logs?direction=in|out&status=&limit=50
+GET /api/logs?direction=in|out&status=&limit=50&from=<ISO>&to=<ISO>
   200: [
     {
       id: "log1",
@@ -110,9 +149,13 @@ GET /api/logs?direction=in|out&status=&limit=50
       response: { ... }
     }
   ]
+  400: { error: "invalid_limit" }         // limit must be a positive integer
+  400: { error: "invalid_time_range" }    // from/to must parse as ISO dates
+  401: { error: "unauthorized" }, 403: { error: "forbidden" }
+  // `from`/`to` filter on `timestamp`, inclusive; either may be given alone.
 ```
 
-### Device Config
+### Device Config (auth required)
 ```
 GET /api/device
   200: {
@@ -127,9 +170,11 @@ GET /api/device
   }
 
 POST /api/device/wifi
-  body: { ssid: string, password: string }
+  body: { ssid: string, password?: string }
+  // Open networks allowed: password may be omitted or empty. A non-empty
+  // password must be >= 8 characters (WPA2 minimum).
   200: { ssid, connected: true }
-  400: { error: "Failed to connect" }
+  400: { error: "ssid_required" | "weak_wifi_password" }
 ```
 
 ## 6. Non-functional

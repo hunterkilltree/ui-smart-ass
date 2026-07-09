@@ -1,12 +1,21 @@
 "use client";
 
-import { I18nProvider } from "@/lib/i18n";
+import { I18nProvider, type Lang } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
+import { ToastProvider } from "@/components/ui";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  initialLang,
+}: {
+  children: React.ReactNode;
+  initialLang?: Lang;
+}) {
   return (
-    <I18nProvider>
-      <AuthProvider>{children}</AuthProvider>
+    <I18nProvider initialLang={initialLang}>
+      <AuthProvider>
+        <ToastProvider>{children}</ToastProvider>
+      </AuthProvider>
     </I18nProvider>
   );
 }

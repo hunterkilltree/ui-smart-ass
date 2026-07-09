@@ -1,19 +1,18 @@
 import { NextResponse } from "next/server";
 import { encodeToken, roleForEmail } from "@/lib/mock/token";
+import { simulateLatency, stableUserId } from "@/lib/mock/util";
 
 export async function POST(req: Request) {
+  await simulateLatency("/api/auth/sign-up");
   const { email, password } = await req.json().catch(() => ({}));
-  if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-    return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+  if (typeof email !== "string" || !/^\S+@\S+\.\S+$/.test(email)) {
+    return NextResponse.json({ error: "invalid_email" }, { status: 400 });
   }
-  if (!password || password.length < 6) {
-    return NextResponse.json(
-      { error: "Password must be at least 6 characters" },
-      { status: 400 }
-    );
+  if (typeof password !== "string" || password.length < 6) {
+    return NextResponse.json({ error: "weak_password" }, { status: 400 });
   }
   const user = {
-    id: `u_${Math.random().toString(36).slice(2, 10)}`,
+    id: stableUserId(email),
     email,
     role: roleForEmail(email),
   };

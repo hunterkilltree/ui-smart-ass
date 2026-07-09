@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000 — you'll be redirected to `/sign-in`.
+Open http://localhost:3000 — you'll land on the bilingual marketing page with sign-in/sign-up CTAs (signed-in users get an "Open dashboard" CTA instead of a forced redirect).
 
 ## Mock auth rules
 
@@ -20,7 +20,7 @@ The built-in mock API accepts any email + any password ≥ 6 chars.
 
 ## Features
 
-- **Auth**: standalone `/sign-in`, `/sign-up`, `/forgot-password` pages; protected `/dashboard/*` routes (redirect to sign-in when unauthenticated)
+- **Auth**: standalone `/sign-in`, `/sign-up`, `/forgot-password`, `/reset-password` pages; protected `/dashboard/*` routes (redirect to sign-in with `?next=` deep-link when unauthenticated)
 - **Contacts tab**: connect/disconnect channels (Zalo, Messenger, Telegram) with per-channel credential forms and status badges
 - **Voice Training tab**: rotating sample sentence bank, browser mic recording (MediaRecorder), playback, re-record, submit (multipart), sample history with pending/processed/failed status (auto-polls while pending)
 - **Logs tab** (developer only): filter by direction/status, expandable raw payload/response viewer
@@ -48,9 +48,12 @@ Empty value (default) = same-origin `/api/*` mock route handlers in `app/api/`. 
 
 ```
 app/
-  sign-in|sign-up|forgot-password/   standalone auth pages
+  page.tsx                           bilingual marketing landing page
+  sign-in|sign-up|forgot-password|reset-password/   standalone auth pages
   dashboard/                         protected layout + 4 tabs
     contacts/ voice-training/ logs/ device/
+  designs/                           internal design-proposal gallery (noindex)
+    art-deco/ playful-geometric/ swiss-minimalist/ web3/
   api/                               mock BE (route handlers)
 components/                          UI primitives, auth shell, language switcher
 lib/                                 api client, auth context, i18n, types, mock store
@@ -61,3 +64,5 @@ lib/                                 api client, auth context, i18n, types, mock
 - Mock token is base64 JSON — not secure, mock only.
 - Mock store is in-memory; resets on server restart.
 - Live device status uses polling-friendly GET (WebSocket/SSE still open per requirements §7).
+- `/designs` is an internal gallery of 4 visual-direction proposals (self-contained Vietnamese mockups, `robots: noindex`); remove before public deployment if undesired.
+- Mock-only dev hints (sign-in role hint, forgot-password reset-link hint) must be removed before any real deployment.

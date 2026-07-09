@@ -1,5 +1,8 @@
-// In-memory mock store. Resets on server restart — fine for FE development.
+// In-memory mock store kept on globalThis. Resets on server restart / new
+// serverless instance — fine for FE development. Time-based behavior must be
+// derived lazily on read (no timers): see resolveSampleStatus below.
 import type { Channel, VoiceSample, LogEntry, DeviceInfo } from "../types";
+import { hashString } from "./util";
 
 const g = globalThis as unknown as { __mockStore?: MockStore };
 
@@ -35,19 +38,30 @@ function seed(): MockStore {
     ],
     samples: [
       {
+        id: "s0",
+        promptId: "p3",
+        status: "failed",
+        failureReason: "audio_unclear",
+        lang: "vi",
+        createdAt: new Date(now - 2 * 86400000).toISOString(),
+      },
+      {
         id: "s1",
         promptId: "p1",
         status: "processed",
+        lang: "vi",
         createdAt: new Date(now - 86400000).toISOString(),
       },
       {
         id: "s2",
         promptId: "p2",
         status: "pending",
+        lang: "vi",
         createdAt: new Date(now - 3600000).toISOString(),
       },
     ],
-    logs: Array.from({ length: 40 }, (_, i) => {
+    // 60 entries (> the API's 50-entry cap) so the UI's "showing first 50" hint is exercisable
+    logs: Array.from({ length: 60 }, (_, i) => {
       const isIn = i % 2 === 0;
       const ok = i % 7 !== 0;
       return {
@@ -84,6 +98,30 @@ function seed(): MockStore {
 export function store(): MockStore {
   if (!g.__mockStore) g.__mockStore = seed();
   return g.__mockStore;
+}
+
+/** How long a submitted sample stays "pending" before it resolves. */
+export const SAMPLE_PROCESSING_MS = 8000;
+
+/**
+ * Lazy, serverless-safe status transition: instead of a setTimeout mutating
+ * state in the background (which dies on Vercel), the final status is derived
+ * on read from the sample's age. Deterministic — a fixed subset of ids
+ * (hash(id) % 5 === 0) fails with a failureReason — so every serverless
+ * instance computes the same answer. Mutates the stored sample in place so
+ * repeated reads within one instance stay consistent.
+ */
+export function resolveSampleStatus(sample: VoiceSample): VoiceSample {
+  if (sample.status !== "pending") return sample;
+  const age = Date.now() - Date.parse(sample.createdAt);
+  if (Number.isNaN(age) || age < SAMPLE_PROCESSING_MS) return sample;
+  if (hashString(sample.id) % 5 === 0) {
+    sample.status = "failed";
+    sample.failureReason = "audio_unclear";
+  } else {
+    sample.status = "processed";
+  }
+  return sample;
 }
 
 export const PROMPTS = [
