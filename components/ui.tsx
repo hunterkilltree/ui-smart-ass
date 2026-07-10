@@ -24,21 +24,24 @@ export function Button({
   /** Shows a spinner, sets aria-busy and disables the button while true. */
   loading?: boolean;
 }) {
+  // Candy buttons: chunky pill, 2px ink border, hard "pop" shadow that lifts
+  // on hover and collapses on press (pop-press, reduced-motion aware).
+  // Ghost stays flat (no border/shadow) for low-emphasis actions.
   const styles = {
     primary:
-      "bg-sen text-white enabled:hover:bg-sen-dark focus-visible:outline-sen",
+      "border-ink bg-sen text-white pop-press enabled:hover:bg-sen-dark focus-visible:outline-sen",
     secondary:
-      "bg-white text-sen border border-sen/30 enabled:hover:bg-sen-light focus-visible:outline-sen",
+      "border-ink bg-white text-ink pop-press enabled:hover:bg-gold focus-visible:outline-sen",
     danger:
-      "bg-red-600 text-white enabled:hover:bg-red-700 focus-visible:outline-red-600",
+      "border-ink bg-red-600 text-white pop-press enabled:hover:bg-red-700 focus-visible:outline-red-600",
     ghost:
-      "text-slate-600 enabled:hover:bg-lotus-light focus-visible:outline-sen",
+      "border-transparent text-slate-600 transition-colors enabled:hover:bg-gold-light enabled:hover:text-ink focus-visible:outline-sen",
   };
   return (
     <button
       className={cx(
         // text-base + generous padding: >=44px target for elderly users
-        "relative inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-base font-semibold transition-colors",
+        "relative inline-flex items-center justify-center gap-2 rounded-full border-2 px-6 py-2.5 text-base font-bold",
         "focus-visible:outline-2 focus-visible:outline-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-50",
         styles[variant],
@@ -53,14 +56,16 @@ export function Button({
           className="absolute inset-0 flex items-center justify-center"
           aria-hidden="true"
         >
-          <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          {/* geometric loader: spinning rounded square (static if reduced motion) */}
+          <span className="h-4 w-4 animate-spin rounded-[3px] border-2 border-current motion-reduce:animate-none" />
         </span>
       )}
-      {/* keep children mounted (invisible) so the width stays stable */}
+      {/* keep children mounted (opacity-0, not visibility:hidden) so the width
+          stays stable AND the accessible name survives while loading */}
       <span
         className={cx(
           "inline-flex items-center justify-center gap-2",
-          loading && "invisible"
+          loading && "opacity-0"
         )}
       >
         {children}
@@ -91,7 +96,7 @@ export function Input({
       {label && (
         <label
           htmlFor={inputId}
-          className="mb-1.5 block text-base font-medium text-slate-700"
+          className="mb-1.5 block text-base font-bold text-ink"
         >
           {label}
         </label>
@@ -101,8 +106,9 @@ export function Input({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         className={cx(
-          "w-full rounded-xl border bg-white px-3.5 py-2.5 text-base outline-none transition-colors focus:border-sen focus:ring-2 focus:ring-sen-light",
-          error ? "border-red-400" : "border-slate-300",
+          // thick border + hard violet shadow on focus (chunky focus ring)
+          "w-full rounded-xl border-2 bg-white px-3.5 py-2.5 text-base outline-none transition-[border-color,box-shadow] focus:border-sen focus:shadow-pop-focus",
+          error ? "border-red-500" : "border-slate-300",
           className
         )}
         {...props}
@@ -135,7 +141,7 @@ export function Select({
       {label && (
         <label
           htmlFor={selectId}
-          className="mb-1.5 block text-base font-medium text-slate-700"
+          className="mb-1.5 block text-base font-bold text-ink"
         >
           {label}
         </label>
@@ -145,8 +151,9 @@ export function Select({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         className={cx(
-          "w-full rounded-xl border bg-white px-3.5 py-2.5 text-base outline-none transition-colors focus:border-sen focus:ring-2 focus:ring-sen-light",
-          error ? "border-red-400" : "border-slate-300",
+          // thick border + hard violet shadow on focus (chunky focus ring)
+          "w-full rounded-xl border-2 bg-white px-3.5 py-2.5 text-base outline-none transition-[border-color,box-shadow] focus:border-sen focus:shadow-pop-focus",
+          error ? "border-red-500" : "border-slate-300",
           className
         )}
         {...props}
@@ -176,7 +183,8 @@ export function Card({
   return (
     <div
       className={cx(
-        "rounded-2xl border border-lotus-light bg-white p-5 shadow-sm",
+        // "sticker" card: thick ink border + soft hard offset shadow
+        "rounded-2xl border-2 border-ink bg-white p-5 shadow-sticker",
         className
       )}
     >
@@ -192,16 +200,17 @@ export function Badge({
   color: "green" | "gray" | "red" | "yellow";
   children: React.ReactNode;
 }) {
+  // chunky outlined pills; border/text use the AA-dark shade of each hue
   const styles = {
-    green: "bg-leaf-light text-leaf-dark",
-    gray: "bg-slate-100 text-slate-600",
-    red: "bg-red-100 text-red-700",
-    yellow: "bg-amber-100 text-amber-700",
+    green: "border-leaf-dark bg-leaf-light text-leaf-dark",
+    gray: "border-slate-500 bg-slate-100 text-slate-600",
+    red: "border-red-700 bg-red-100 text-red-700",
+    yellow: "border-amber-800 bg-gold-light text-amber-800",
   };
   return (
     <span
       className={cx(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-sm font-medium",
+        "inline-flex items-center gap-1 rounded-full border-2 px-2.5 py-0.5 text-sm font-bold",
         styles[color]
       )}
     >
@@ -219,16 +228,21 @@ export function Alert({
   className?: string;
   children: React.ReactNode;
 }) {
+  // playful but readable: tinted surface, chunky tonal border, dark AA text
   const styles = {
-    error: "bg-red-50 text-red-700 border border-red-200",
-    success: "bg-leaf-light text-leaf-dark border border-leaf/40",
-    info: "bg-sen-light text-sen-dark border border-sen/30",
+    error: "bg-red-50 text-red-700 border-2 border-red-300",
+    success: "bg-leaf-light text-leaf-dark border-2 border-leaf",
+    info: "bg-sen-light text-sen-dark border-2 border-sen/40",
   };
   return (
     <div
       role={kind === "error" ? "alert" : "status"}
       aria-live={kind === "error" ? undefined : "polite"}
-      className={cx("rounded-lg px-4 py-3 text-base", styles[kind], className)}
+      className={cx(
+        "rounded-xl px-4 py-3 text-base font-medium",
+        styles[kind],
+        className
+      )}
     >
       {children}
     </div>
@@ -348,11 +362,12 @@ function ModalContent({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="relative max-h-[calc(100vh-2rem)] w-full max-w-md overflow-y-auto rounded-xl bg-white p-6 shadow-xl outline-none"
+        /* bordered "sticker" panel: thick ink border + hard offset shadow */
+        className="relative max-h-[calc(100vh-2rem)] w-full max-w-md overflow-y-auto rounded-2xl border-2 border-ink bg-white p-6 shadow-pop-lg outline-none"
       >
         <h3
           id={titleId}
-          className="mb-4 pr-10 text-xl font-semibold text-slate-900"
+          className="mb-4 pr-10 font-display text-xl font-extrabold text-ink"
         >
           {title}
         </h3>
@@ -361,7 +376,7 @@ function ModalContent({
           type="button"
           onClick={onClose}
           aria-label={closeLabel ?? t("close")}
-          className="absolute right-2 top-2 flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+          className="absolute right-2 top-2 flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-gold-light hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
         >
           <X size={22} aria-hidden="true" />
         </button>
@@ -433,15 +448,18 @@ export function Spinner({
 }) {
   const { t } = useI18n();
   const sizes = {
-    sm: "h-4 w-4 border-2",
-    md: "h-8 w-8 border-2",
+    sm: "h-4 w-4 rounded-[3px]",
+    md: "h-8 w-8 rounded-md",
   };
   return (
     <span role="status" className={cx("inline-flex", className)}>
+      {/* geometric loader: spinning amber square with ink border; freezes to
+          a static "diamond" sticker under prefers-reduced-motion (the sr-only
+          label below still announces loading) */}
       <span
         aria-hidden="true"
         className={cx(
-          "animate-spin rounded-full border-lotus-light border-t-sen",
+          "animate-spin border-2 border-ink bg-gold motion-reduce:animate-none motion-reduce:rotate-45",
           sizes[size]
         )}
       />
@@ -463,7 +481,7 @@ export function Skeleton({ className }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={cx("animate-pulse rounded-lg bg-slate-200/80", className)}
+      className={cx("animate-pulse rounded-xl bg-slate-200/80", className)}
     />
   );
 }
@@ -484,16 +502,22 @@ export function EmptyState({
   return (
     <div
       className={cx(
-        "flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-10 text-center",
+        "flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-400 bg-white/70 px-6 py-10 text-center",
         className
       )}
     >
+      {/* deterministic confetti trio (static positions, decoration only) */}
+      <div aria-hidden="true" className="mb-1 flex items-center gap-2">
+        <span className="h-3.5 w-3.5 rounded-full border-2 border-ink bg-leaf" />
+        <span className="h-3.5 w-3.5 rotate-12 rounded-[3px] border-2 border-ink bg-gold" />
+        <span className="h-3.5 w-3.5 rounded-full border-2 border-ink bg-lotus" />
+      </div>
       {icon && (
         <div className="mb-1 text-slate-500" aria-hidden="true">
           {icon}
         </div>
       )}
-      <p className="text-base font-semibold text-slate-700">{title}</p>
+      <p className="font-display text-base font-bold text-ink">{title}</p>
       {description && (
         <p className="max-w-sm text-base text-slate-600">{description}</p>
       )}
@@ -519,11 +543,17 @@ export function ErrorState({
     <div
       role="alert"
       className={cx(
-        "flex flex-col items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-6 py-10 text-center",
+        "flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-red-300 bg-red-50 px-6 py-10 text-center",
         className
       )}
     >
-      <AlertCircle size={32} className="mb-1 text-red-600" aria-hidden="true" />
+      {/* icon enclosed in a sticker circle (spec: icons live inside shapes) */}
+      <span
+        aria-hidden="true"
+        className="mb-1 flex h-14 w-14 items-center justify-center rounded-full border-2 border-ink bg-white shadow-pop-sm"
+      >
+        <AlertCircle size={30} strokeWidth={2.5} className="text-red-600" />
+      </span>
       <p className="max-w-sm text-base font-semibold text-red-700">{message}</p>
       {onRetry && (
         <div className="mt-3">
@@ -623,10 +653,11 @@ function ToastCard({
 }) {
   const { t } = useI18n();
   const isError = item.kind === "error";
+  // sticker toasts: tinted surface, ink border, hard pop shadow, AA-dark text
   const styles: Record<ToastKind, string> = {
-    success: "border-leaf/40 bg-leaf-light text-leaf-dark",
-    error: "border-red-200 bg-red-50 text-red-700",
-    info: "border-sen/30 bg-sen-light text-sen-dark",
+    success: "bg-leaf-light text-leaf-dark",
+    error: "bg-red-50 text-red-700",
+    info: "bg-sen-light text-sen-dark",
   };
   const icons: Record<ToastKind, React.ReactNode> = {
     success: <CheckCircle2 size={22} aria-hidden="true" />,
@@ -638,7 +669,7 @@ function ToastCard({
       role={isError ? "alert" : "status"}
       aria-live={isError ? "assertive" : "polite"}
       className={cx(
-        "pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-xl border p-4 text-base font-medium shadow-lg",
+        "pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-2xl border-2 border-ink p-4 text-base font-semibold shadow-pop",
         styles[item.kind]
       )}
     >
@@ -648,7 +679,7 @@ function ToastCard({
         type="button"
         onClick={onDismiss}
         aria-label={t("dismissNotification")}
-        className="-m-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-current opacity-70 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+        className="-m-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-current hover:bg-black/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
       >
         <X size={20} aria-hidden="true" />
       </button>

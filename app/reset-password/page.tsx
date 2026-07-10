@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import { Check, Eye, EyeOff } from "lucide-react";
 import { ApiError } from "@/lib/api";
 import { AuthAPI } from "@/lib/be";
 import { useMutation } from "@/lib/useQuery";
@@ -48,12 +48,12 @@ function PasswordField({
         onClick={() => setShow((s) => !s)}
         aria-label={show ? t("hidePassword") : t("showPassword")}
         aria-pressed={show}
-        className="absolute right-0 top-[31px] flex h-12 w-12 items-center justify-center rounded-xl text-slate-500 hover:text-slate-700 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sen"
+        className="absolute right-0.5 top-[31px] flex h-12 w-12 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-gold-light hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sen"
       >
         {show ? (
-          <EyeOff size={22} aria-hidden="true" />
+          <EyeOff size={22} strokeWidth={2.5} aria-hidden="true" />
         ) : (
-          <Eye size={22} aria-hidden="true" />
+          <Eye size={22} strokeWidth={2.5} aria-hidden="true" />
         )}
       </button>
     </div>
@@ -94,15 +94,16 @@ function ResetPasswordForm() {
       <AuthShell title={t("resetPassword")}>
         <div className="space-y-4">
           <Alert>{t("resetLinkInvalid")}</Alert>
+          {/* main recovery action: candy pill (matches Button "secondary") */}
           <Link
             href="/forgot-password"
-            className="block rounded text-center text-base text-sen hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+            className="pop-press flex min-h-12 w-full items-center justify-center rounded-full border-2 border-ink bg-white px-6 py-2.5 text-center text-base font-bold text-ink hover:bg-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
           >
             {t("requestNewLink")}
           </Link>
           <Link
             href="/sign-in"
-            className="block rounded text-center text-base text-sen hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+            className="block rounded-md py-2 text-center text-base font-bold text-sen underline decoration-2 underline-offset-4 transition-colors hover:text-sen-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
           >
             {t("backToSignIn")}
           </Link>
@@ -115,10 +116,22 @@ function ResetPasswordForm() {
     return (
       <AuthShell title={t("resetPassword")}>
         <div className="space-y-4">
+          {/* playful success accent: check "coin" with confetti dots */}
+          <div
+            aria-hidden="true"
+            className="pop-in flex items-center justify-center gap-3"
+          >
+            <span className="h-3 w-3 rotate-12 rounded-[3px] border-2 border-ink bg-gold" />
+            <span className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-ink bg-leaf shadow-pop-sm">
+              <Check size={28} strokeWidth={3} className="text-ink" />
+            </span>
+            <span className="h-3 w-3 rounded-full border-2 border-ink bg-lotus" />
+          </div>
           <Alert kind="success">{t("resetSuccess")}</Alert>
+          {/* primary action: candy pill (matches Button "primary") */}
           <Link
             href="/sign-in"
-            className="flex w-full items-center justify-center rounded-xl bg-sen px-5 py-2.5 text-base font-semibold text-white transition-colors hover:bg-sen-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+            className="pop-press flex min-h-12 w-full items-center justify-center rounded-full border-2 border-ink bg-sen px-6 py-2.5 text-base font-bold text-white hover:bg-sen-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
           >
             {t("signIn")}
           </Link>
@@ -151,7 +164,7 @@ function ResetPasswordForm() {
             {linkInvalid && (
               <Link
                 href="/forgot-password"
-                className="block rounded text-center text-base text-sen hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+                className="block rounded-md py-1 text-center text-base font-bold text-sen underline decoration-2 underline-offset-4 transition-colors hover:text-sen-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
               >
                 {t("requestNewLink")}
               </Link>
@@ -207,7 +220,7 @@ function ResetPasswordForm() {
         </Button>
         <Link
           href="/sign-in"
-          className="block rounded text-center text-base text-sen hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+          className="block rounded-md py-2 text-center text-base font-bold text-sen underline decoration-2 underline-offset-4 transition-colors hover:text-sen-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
         >
           {t("backToSignIn")}
         </Link>

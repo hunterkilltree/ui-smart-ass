@@ -81,21 +81,22 @@ function PayloadPane({ label, value }: { label: string; value: unknown }) {
 
   return (
     <div className="min-w-0">
-      <div className="mb-1 flex items-center justify-between gap-2">
-        <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
+        <p className="font-display text-sm font-extrabold uppercase tracking-widest text-slate-600">
           {label}
         </p>
         <button
           type="button"
           onClick={() => void handleCopy()}
           aria-label={`${t("copy")}: ${label}`}
-          className="flex h-11 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-slate-600 hover:bg-lotus-light hover:text-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
+          className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border-2 border-ink bg-white px-4 text-sm font-bold text-ink transition-colors hover:bg-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sen"
         >
           <Copy size={18} aria-hidden="true" />
           {t("copy")}
         </button>
       </div>
-      <pre className="max-h-64 overflow-auto rounded-lg bg-slate-900 p-3 text-sm text-slate-100">
+      {/* payload viewer: monospace, dark-on-light "paper" panel */}
+      <pre className="max-h-64 overflow-auto rounded-xl border-2 border-slate-300 bg-slate-50 p-3 text-sm leading-relaxed text-ink">
         {text}
       </pre>
     </div>
@@ -150,12 +151,27 @@ export default function LogsPage() {
 
   return (
     <div>
-      <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">
+          <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink">
             {t("logsTitle")}
           </h2>
-          <p className="mt-1 text-base text-slate-600">{t("logsDesc")}</p>
+          {/* squiggle flourish under the page title (decorative) */}
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            viewBox="0 0 160 14"
+            fill="none"
+            className="mt-1.5 w-28 text-lotus"
+          >
+            <path
+              d="M3 10 Q 13 3 23 10 T 43 10 T 63 10 T 83 10 T 103 10 T 123 10 T 143 10 T 157 10"
+              stroke="currentColor"
+              strokeWidth="5"
+              strokeLinecap="round"
+            />
+          </svg>
+          <p className="mt-2 text-base text-slate-600">{t("logsDesc")}</p>
         </div>
         <Button
           variant="secondary"
@@ -166,38 +182,45 @@ export default function LogsPage() {
         </Button>
       </div>
 
-      <div className="mb-4 grid gap-3 sm:grid-cols-3">
-        <Select
-          label={t("direction")}
-          value={direction}
-          onChange={(e) => setDirection(e.target.value as "" | "in" | "out")}
-        >
-          <option value="">{t("all")}</option>
-          <option value="in">{t("incoming")}</option>
-          <option value="out">{t("outgoing")}</option>
-        </Select>
-        <Select
-          label={t("status")}
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="">{t("all")}</option>
-          <option value="200">200</option>
-          <option value="400">400</option>
-          <option value="401">401</option>
-          <option value="500">500</option>
-        </Select>
-        <Select
-          label={t("time")}
-          value={timeRange}
-          onChange={(e) => setTimeRange(e.target.value as TimeRange)}
-        >
-          <option value="all">{t("all")}</option>
-          <option value="15m">{t("logsLast15m")}</option>
-          <option value="1h">{t("logsLast1h")}</option>
-          <option value="24h">{t("logsLast24h")}</option>
-          <option value="7d">{t("logsLast7d")}</option>
-        </Select>
+      {/* filter toolbar: sticker card with a rotated confetti chip on top */}
+      <div className="relative mb-5 rounded-2xl border-2 border-ink bg-white p-4 shadow-sticker sm:p-5">
+        <span
+          aria-hidden="true"
+          className="absolute -top-3 right-5 hidden h-6 w-6 rotate-12 rounded-md border-2 border-ink bg-gold sm:block"
+        />
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Select
+            label={t("direction")}
+            value={direction}
+            onChange={(e) => setDirection(e.target.value as "" | "in" | "out")}
+          >
+            <option value="">{t("all")}</option>
+            <option value="in">{t("incoming")}</option>
+            <option value="out">{t("outgoing")}</option>
+          </Select>
+          <Select
+            label={t("status")}
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="">{t("all")}</option>
+            <option value="200">200</option>
+            <option value="400">400</option>
+            <option value="401">401</option>
+            <option value="500">500</option>
+          </Select>
+          <Select
+            label={t("time")}
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value as TimeRange)}
+          >
+            <option value="all">{t("all")}</option>
+            <option value="15m">{t("logsLast15m")}</option>
+            <option value="1h">{t("logsLast1h")}</option>
+            <option value="24h">{t("logsLast24h")}</option>
+            <option value="7d">{t("logsLast7d")}</option>
+          </Select>
+        </div>
       </div>
 
       {loading ? (
@@ -237,8 +260,9 @@ export default function LogsPage() {
             />
           ) : (
             <>
-              <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <p className="text-base font-medium text-slate-700">
+              <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                {/* count coin: chunky pill so the total reads at a glance */}
+                <p className="inline-flex items-center rounded-full border-2 border-ink bg-white px-3.5 py-1 text-base font-bold text-ink shadow-pop-sm">
                   {logs.length}{" "}
                   {logs.length === 1
                     ? t("logsEventSingular")
@@ -250,7 +274,11 @@ export default function LogsPage() {
                   </p>
                 )}
                 {live && (
-                  <p className="text-sm text-slate-600">
+                  <p className="flex items-center gap-2 text-sm text-slate-600">
+                    <span
+                      aria-hidden="true"
+                      className="h-2.5 w-2.5 rounded-full border border-ink bg-leaf motion-safe:animate-pulse"
+                    />
                     {t("logsAutoRefreshOn")}
                   </p>
                 )}
@@ -264,27 +292,41 @@ export default function LogsPage() {
                     <Card key={log.id} className="p-0">
                       <button
                         type="button"
-                        className="flex w-full items-start gap-3 rounded-2xl px-4 py-3 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sen"
+                        className={
+                          "flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-gold-light/50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sen " +
+                          (expanded ? "rounded-t-2xl" : "rounded-2xl")
+                        }
                         onClick={() => setOpen(expanded ? null : log.id)}
                         aria-expanded={expanded}
                         aria-controls={expanded ? detailId : undefined}
                       >
-                        {expanded ? (
-                          <ChevronDown
-                            size={18}
-                            className="mt-1 shrink-0 text-slate-500"
-                            aria-hidden="true"
-                          />
-                        ) : (
-                          <ChevronRight
-                            size={18}
-                            className="mt-1 shrink-0 text-slate-500"
-                            aria-hidden="true"
-                          />
-                        )}
+                        {/* chevron coin: bordered circle, fills gold when open */}
+                        <span
+                          aria-hidden="true"
+                          className={
+                            "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-ink transition-colors " +
+                            (expanded ? "bg-gold" : "bg-white")
+                          }
+                        >
+                          {expanded ? (
+                            <ChevronDown
+                              size={18}
+                              strokeWidth={2.5}
+                              className="text-ink"
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            <ChevronRight
+                              size={18}
+                              strokeWidth={2.5}
+                              className="text-ink"
+                              aria-hidden="true"
+                            />
+                          )}
+                        </span>
                         <span className="flex min-w-0 flex-1 flex-col gap-1.5">
                           <span className="flex min-w-0 items-center gap-3">
-                            <code className="min-w-0 flex-1 truncate text-base text-slate-800">
+                            <code className="min-w-0 flex-1 truncate text-base font-semibold text-ink">
                               {log.endpoint}
                             </code>
                             <span className="shrink-0">
@@ -310,7 +352,7 @@ export default function LogsPage() {
                       {expanded && (
                         <div
                           id={detailId}
-                          className="grid gap-3 border-t border-slate-100 px-4 py-3 sm:grid-cols-2"
+                          className="grid gap-4 border-t-2 border-dashed border-slate-300 px-4 py-4 sm:grid-cols-2"
                         >
                           <PayloadPane
                             label={t("payload")}

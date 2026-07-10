@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import "./globals.css";
+import { outfit, plusJakarta } from "./fonts";
 import { Providers } from "./providers";
 import type { Lang } from "@/lib/i18n";
 
@@ -23,7 +24,7 @@ export default async function RootLayout({
   const lang: Lang = cookieLang === "en" ? "en" : "vi";
 
   return (
-    <html lang={lang}>
+    <html lang={lang} className={`${outfit.variable} ${plusJakarta.variable}`}>
       <body className="antialiased">
         <Providers initialLang={lang}>{children}</Providers>
       </body>

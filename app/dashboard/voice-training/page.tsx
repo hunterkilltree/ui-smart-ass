@@ -411,8 +411,42 @@ export default function VoiceTrainingPage() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-slate-900">{t("voiceTitle")}</h2>
-      <p className="mb-5 mt-1 text-base text-slate-600">{t("voiceDesc")}</p>
+      <div className="relative">
+        {/* decorative confetti triangle (deterministic, hidden on small screens) */}
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          viewBox="0 0 24 24"
+          className="absolute right-0 top-0 hidden h-7 w-7 rotate-12 text-lotus lg:block"
+        >
+          <path
+            d="M12 3 L21 20 H3 Z"
+            fill="currentColor"
+            stroke="var(--color-ink)"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink">
+          {t("voiceTitle")}
+        </h2>
+        {/* squiggle underline flourish */}
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          viewBox="0 0 160 14"
+          fill="none"
+          className="mt-1.5 w-28 text-leaf"
+        >
+          <path
+            d="M3 10 Q 13 3 23 10 T 43 10 T 63 10 T 83 10 T 103 10 T 123 10 T 143 10 T 157 10"
+            stroke="currentColor"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+        </svg>
+        <p className="mb-6 mt-2 text-base text-slate-600">{t("voiceDesc")}</p>
+      </div>
 
       {/* Recording lifecycle announcements for screen readers */}
       <div aria-live="assertive" aria-atomic="true" className="sr-only">
@@ -445,7 +479,7 @@ export default function VoiceTrainingPage() {
         />
       ) : (
         <div ref={recorderCardRef} className="scroll-mt-6">
-          <Card className="mb-6">
+          <Card className="pop-in mb-6">
             {micError && (
               <div className="mb-4">
                 <Alert>{micErrorText}</Alert>
@@ -466,13 +500,19 @@ export default function VoiceTrainingPage() {
               </div>
             )}
 
-            <div className="flex items-baseline justify-between gap-3">
-              <p className="text-base text-slate-600">{t("readAloud")}</p>
-              <p className="text-base tabular-nums text-slate-600">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-base font-semibold text-slate-600">{t("readAloud")}</p>
+              {/* prompt counter as a sticker coin */}
+              <p className="rounded-full border-2 border-ink bg-cream px-3 py-0.5 text-base font-bold tabular-nums text-ink shadow-pop-sm">
                 {idx + 1}/{promptCount}
               </p>
             </div>
-            <p className="my-3 rounded-2xl bg-lotus-light px-4 py-3 text-xl font-semibold text-sen-dark">
+            {/* hero sample sentence: highlight-marker sticker (speech-bubble corner) */}
+            <p className="relative my-4 rounded-2xl rounded-bl-none border-2 border-ink bg-gold-light px-5 py-4 font-display text-xl font-bold leading-relaxed text-ink shadow-pop sm:text-2xl">
+              <span
+                aria-hidden="true"
+                className="absolute -right-2 -top-3 hidden h-6 w-6 rotate-12 rounded-md border-2 border-ink bg-lotus sm:block"
+              />
               “{lang === "vi" ? prompt.text_vi : prompt.text_en}”
             </p>
 
@@ -505,9 +545,10 @@ export default function VoiceTrainingPage() {
                   >
                     <Square size={18} aria-hidden="true" /> {t("stop")}
                   </Button>
-                  <span className="flex items-center gap-2 text-base font-medium text-red-600">
+                  {/* recording status + timer as a sticker chip */}
+                  <span className="inline-flex items-center gap-2 rounded-full border-2 border-ink bg-red-50 px-4 py-2 text-base font-bold text-red-700 shadow-pop-sm">
                     <span
-                      className="h-3 w-3 animate-pulse rounded-full bg-red-600"
+                      className="h-3 w-3 animate-pulse rounded-full bg-red-600 motion-reduce:animate-none"
                       aria-hidden="true"
                     />
                     {t("recording")}{" "}
@@ -549,9 +590,11 @@ export default function VoiceTrainingPage() {
         </div>
       )}
 
-      <h3 className="mb-3 text-lg font-semibold text-slate-900">{t("sampleHistory")}</h3>
+      <h3 className="mb-3 font-display text-xl font-extrabold tracking-tight text-ink">
+        {t("sampleHistory")}
+      </h3>
       {samplesQ.loading ? (
-        <div className="space-y-2" aria-hidden="true">
+        <div className="space-y-3" aria-hidden="true">
           <Skeleton className="h-20 w-full rounded-2xl" />
           <Skeleton className="h-20 w-full rounded-2xl" />
           <Skeleton className="h-20 w-full rounded-2xl" />
@@ -570,7 +613,7 @@ export default function VoiceTrainingPage() {
               <Alert kind="info">{t("historyRefreshFailed")}</Alert>
             </div>
           )}
-          <div className="space-y-2">
+          <div className="space-y-3">
             {samples.map((s) => {
               const p = prompts?.find((pp) => pp.id === s.promptId);
               const variant = s.lang ?? lang;
@@ -578,7 +621,7 @@ export default function VoiceTrainingPage() {
                 <Card key={s.id} className="py-3">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-base font-medium text-slate-800">
+                      <p className="truncate text-base font-semibold text-ink">
                         {p ? (variant === "vi" ? p.text_vi : p.text_en) : s.promptId}
                       </p>
                       <p className="text-base text-slate-600">
@@ -588,7 +631,7 @@ export default function VoiceTrainingPage() {
                     {statusBadge(s.status)}
                   </div>
                   {s.status === "failed" && (
-                    <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-lotus-light pt-3">
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t-2 border-dashed border-slate-300 pt-3">
                       <p className="text-base text-red-700">{failureText(s.failureReason)}</p>
                       {support?.ok === true && prompts?.some((pp) => pp.id === s.promptId) && (
                         <Button variant="secondary" onClick={() => retryFromSample(s)}>

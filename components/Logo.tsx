@@ -23,12 +23,13 @@ export function LogoMark({
       role="img"
       aria-label={label}
     >
-      {/* ring */}
-      <circle cx="32" cy="32" r="30" fill="#fffdf9" stroke="var(--color-sen)" strokeWidth="3" />
+      {/* ring — white disc so the mark pops as a sticker on the cream bg */}
+      <circle cx="32" cy="32" r="30" fill="#ffffff" stroke="var(--color-sen)" strokeWidth="3" />
       {/* leaves */}
       <ellipse cx="20" cy="44" rx="11" ry="5.5" fill="var(--color-leaf)" transform="rotate(-14 20 44)" />
       <ellipse cx="44" cy="44" rx="11" ry="5.5" fill="var(--color-leaf)" transform="rotate(14 44 44)" />
-      <ellipse cx="32" cy="46" rx="12" ry="5.5" fill="#7cbf4d" />
+      {/* center-leaf highlight: lighter shade of the mint leaf token */}
+      <ellipse cx="32" cy="46" rx="12" ry="5.5" fill="#6ee7b7" />
       {/* side petals */}
       <path d="M18 38c-5-7-4-15 1-19 3 5 5 12 4 19z" fill="#f8a8c0" />
       <path d="M46 38c5-7 4-15-1-19-3 5-5 12-4 19z" fill="#f8a8c0" />

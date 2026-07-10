@@ -97,6 +97,52 @@ const dict = {
     landingStep3Title: "Trò chuyện mỗi ngày",
     landingStep3Desc:
       "Ông bà trò chuyện với SEN thật tự nhiên — cả nhà luôn gần nhau.",
+    // Playful Geometric landing: headline split for the highlight-marker
+    // treatment (lead + marked word + tail render as one sentence), the
+    // decorative hero vignette copy and the final CTA block.
+    landingHeroTitleLead: "Ông bà luôn có người",
+    landingHeroTitleHighlight: "trò chuyện",
+    landingHeroTitleTail: ", con cháu luôn an tâm",
+    landingBubbleSender: "Cháu Minh · Zalo",
+    landingBubbleMessage: "Bà ơi, cuối tuần cháu về ăn cơm nhé!",
+    landingBubbleReading: "SEN đang đọc to cho bà nghe…",
+    landingCtaTitle: "Đừng để ông bà lỡ một lời hỏi thăm nào.",
+    // Header anchor nav + hero trust checklist (proposal composition).
+    landingNavLabel: "Liên kết trang giới thiệu",
+    landingNavFeatures: "Tính năng",
+    landingNavHow: "Cách hoạt động",
+    landingNavStory: "Câu chuyện",
+    landingTrustSetup: "Thiết lập trong 15 phút",
+    landingTrustVietnamese: "Tiếng Việt là mặc định",
+    landingTrustRemote: "Con cháu quản lý từ xa",
+    // Marquee keyword strip (channel names stay literal — brand names).
+    landingMarqueeVoice: "Giọng nói thân quen",
+    landingMarqueeSafety: "An toàn cho gia đình",
+    landingMarqueeNoPhone: "Không cần điện thoại",
+    // Stats / trust strip.
+    landingStatsTitle: "Con số nổi bật",
+    landingStat1Value: "3",
+    landingStat1Label: "kênh nhắn tin quen thuộc — Zalo, Messenger, Telegram",
+    landingStat2Value: "15 phút",
+    landingStat2Label: "từ lúc mở hộp đến câu chào đầu tiên",
+    landingStat3Value: "100%",
+    landingStat3Label: "giao diện và giọng đọc tiếng Việt",
+    landingStat4Value: "24/7",
+    landingStat4Label: "theo dõi Wi-Fi, micro, loa của thiết bị",
+    // Testimonial ("family story") speech-bubble section.
+    landingStoryBadge: "Gia đình tin dùng",
+    landingStoryQuote:
+      "Mẹ tôi 74 tuổi, cầm điện thoại cảm ứng là hoa mắt. Từ ngày có SEN, sáng nào bà cũng chờ ‘nghe tin’ các cháu. Bà bảo: nhà mình như đông đủ cả, chỉ thiếu mâm cơm.",
+    landingStoryInitials: "TH",
+    landingStoryName: "Chị Thu Hà, 41 tuổi",
+    landingStoryRole: "Con gái bác Lan (Hà Nội) — gia đình dùng SEN từ 2025",
+    // 4-column footer.
+    landingFooterTagline:
+      "Người bạn đồng hành AI cho ông bà — để mỗi lời hỏi thăm của con cháu luôn được nghe thấy.",
+    landingFooterProduct: "Sản phẩm",
+    landingFooterSupport: "Hỗ trợ",
+    landingFooterAccount: "Tài khoản",
+    landingFooterGuide: "Hướng dẫn cài đặt",
     // --- section: contacts ---
     credOaId: "Mã Official Account Zalo (OA ID)",
     credAccessToken: "Mã truy cập (Access Token)",
@@ -314,6 +360,52 @@ const dict = {
     landingStep3Title: "Chat every day",
     landingStep3Desc:
       "Your loved one talks to SEN naturally — the family always feels close.",
+    // Playful Geometric landing: headline split for the highlight-marker
+    // treatment (lead + marked word + tail render as one sentence), the
+    // decorative hero vignette copy and the final CTA block.
+    landingHeroTitleLead: "Someone to",
+    landingHeroTitleHighlight: "talk to every day",
+    landingHeroTitleTail: ", peace of mind for the family",
+    landingBubbleSender: "Minh (grandchild) · Zalo",
+    landingBubbleMessage: "Grandma, I'm coming home for dinner this weekend!",
+    landingBubbleReading: "SEN is reading it aloud…",
+    landingCtaTitle: "Don't let your loved ones miss a single caring word.",
+    // Header anchor nav + hero trust checklist (proposal composition).
+    landingNavLabel: "Landing page sections",
+    landingNavFeatures: "Features",
+    landingNavHow: "How it works",
+    landingNavStory: "Family stories",
+    landingTrustSetup: "Set up in 15 minutes",
+    landingTrustVietnamese: "Vietnamese by default",
+    landingTrustRemote: "Family manages it remotely",
+    // Marquee keyword strip (channel names stay literal — brand names).
+    landingMarqueeVoice: "A familiar voice",
+    landingMarqueeSafety: "Safe for the family",
+    landingMarqueeNoPhone: "No phone needed",
+    // Stats / trust strip.
+    landingStatsTitle: "Key numbers",
+    landingStat1Value: "3",
+    landingStat1Label: "familiar messaging channels — Zalo, Messenger, Telegram",
+    landingStat2Value: "15 min",
+    landingStat2Label: "from unboxing to the first hello",
+    landingStat3Value: "100%",
+    landingStat3Label: "Vietnamese interface and reading voice",
+    landingStat4Value: "24/7",
+    landingStat4Label: "monitoring of the device's Wi-Fi, mic and speaker",
+    // Testimonial ("family story") speech-bubble section.
+    landingStoryBadge: "Trusted by families",
+    landingStoryQuote:
+      "My mother is 74 — touchscreen phones make her dizzy. Since SEN arrived, she waits every morning to ‘hear the news’ from the grandkids. She says the house feels full again, as if only the family meal were missing.",
+    landingStoryInitials: "TH",
+    landingStoryName: "Thu Hà, 41",
+    landingStoryRole: "Daughter of Mrs. Lan (Hanoi) — a SEN family since 2025",
+    // 4-column footer.
+    landingFooterTagline:
+      "An AI companion for grandparents — so every caring word from the family is always heard.",
+    landingFooterProduct: "Product",
+    landingFooterSupport: "Support",
+    landingFooterAccount: "Account",
+    landingFooterGuide: "Setup guide",
     // --- section: contacts ---
     credOaId: "Zalo Official Account ID (OA ID)",
     credAccessToken: "Access token",
